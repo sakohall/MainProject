@@ -15,10 +15,11 @@ public class MainProject {
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
-		
-		ColorPicker cp = new ColorPicker();
+
+        ColorLabel cl = new ColorLabel();
+		ColorPicker cp = new ColorPicker(cl);
 		SwipePanel sp = new SwipePanel(cp);
-		ColorLabel cl = new ColorLabel();
+
 		mainPanel.add(sp);
 		mainPanel.add(cp);
 		mainPanel.add(cl);

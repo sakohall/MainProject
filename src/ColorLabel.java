@@ -21,6 +21,9 @@ public class ColorLabel extends JPanel{
     public static int rToPass;
     public static boolean isPassing;
     public int iToPass; // the index of the color being passed
+
+    public boolean isSelected;
+    public int idxSelected;
     
     ArrayList<ColorItem> items;
     private Point takingPos;
@@ -39,6 +42,8 @@ public class ColorLabel extends JPanel{
         setVisible(true);
         items = new ArrayList<>();
         isPassing = false;
+        isNew = false;
+        isSelected = false;
     }
 
     private class ColorItem{
@@ -67,6 +72,21 @@ public class ColorLabel extends JPanel{
                         items.get(i).pos.y-items.get(i).radius,
                         2*items.get(i).radius,
                         2*items.get(i).radius);
+
+            if(isSelected && idxSelected == i){
+                g.setColor(Color.black);
+                final float dash1[] = {10.0f};
+                final  BasicStroke dashed =
+                        new BasicStroke(1.0f,
+                                BasicStroke.CAP_BUTT,
+                                BasicStroke.JOIN_MITER,
+                                10.0f, dash1, 0.0f);
+                g.setStroke(dashed);
+                g.drawOval(items.get(i).pos.x-items.get(i).radius -5,
+                        items.get(i).pos.y-items.get(i).radius - 5,
+                        2*items.get(i).radius+10,
+                        2*items.get(i).radius+10);
+            }
 
         }
         if(isPassing){
@@ -102,13 +122,36 @@ public class ColorLabel extends JPanel{
         }
     }
 
+    public void setColor(Color c){
+        items.get(idxSelected).color = c;
+        repaint();
+    }
+
+    private boolean isNew;
     /**
      * Mouse adapter: to handle the mouse events
      */
-
     private class mListener extends MouseAdapter{
         public mListener(){
             super();
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent e){
+            int idx = inBorder(e.getPoint());
+            if(idx != -1){
+                if(isNew){
+                    isNew = false;
+                }
+                else{
+                    isSelected = true;
+                    idxSelected = idx;
+                }
+
+            }
+            else{
+                isSelected = false;
+            }
         }
 
         @Override
@@ -130,9 +173,11 @@ public class ColorLabel extends JPanel{
         }
 
         private java.util.Timer t;
+        private java.util.Timer t0;
         @Override
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
+            isSelected = false;
             takingPos = e.getPoint();
             int idx = inBorder(takingPos);
             if(t == null){
@@ -154,11 +199,19 @@ public class ColorLabel extends JPanel{
                 },0,500);
             }
             else{
-                ColorItem ci = new ColorItem();
-                ci.radius=0;
-                ci.color=ColorPicker.mainColor;
-                ci.pos=e.getPoint();
-                items.add(ci);
+                t0 = new java.util.Timer();
+                t0.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        ColorItem ci = new ColorItem();
+                        ci.radius=0;
+                        ci.color=ColorPicker.mainColor;
+                        ci.pos=e.getPoint();
+                        items.add(ci);
+                        isNew = true;
+                    }
+                },100);
+
                 t.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -177,6 +230,10 @@ public class ColorLabel extends JPanel{
             if( t!=null ){
                 t.cancel();
                 t = null;
+            }
+            if(t0 != null){
+                t0.cancel();
+                t0 = null;
             }
             if(idx != -1 && isPassing){
                 items.get(idx).color = mixColor(items.get(idx).color,cToPass, items.get(idx).radius, rToPass);

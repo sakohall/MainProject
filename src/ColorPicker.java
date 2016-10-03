@@ -37,13 +37,16 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 //	private float tempSaturation = 0.9f;
 //	private float brightness = 0.0f;
 //	private float tempBrightness = 0.9f;
-	
-	public ColorPicker() {	
+
+	private ColorLabel cLabel;
+
+	public ColorPicker(ColorLabel cl) {
 		setPreferredSize(new Dimension(400, 600));
 		setVisible(true);
 		
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		cLabel = cl;
 	}
 	
 	private void doDrawing(Graphics g) {
@@ -98,6 +101,9 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 		}
 		
 		mainColor = Color.getHSBColor(hue + tempHue, saturation + tempSaturation, brightness + tempBrightness);
+		if(cLabel.isSelected){
+			cLabel.setColor(mainColor);
+		}
 		float sum1 = saturation + tempSaturation;
 		float sum2 = brightness + tempBrightness;
 //		System.out.println(sum1 + " " + sum2);

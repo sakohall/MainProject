@@ -129,7 +129,12 @@ public class Palette extends JPanel {
                 int idx = inBorder(e.getPoint());
                 if(idx != -1){
                     selectedIdx = idx;
-                    cPicker.setColor(cSet.get(idx));
+                    if(cLabel.isSelected){
+                        cLabel.setColor(cSet.get(idx));
+                    }
+                    else{
+                        cPicker.setColor(cSet.get(idx));
+                    }
                     System.out.println("[Debug] color picker updated");
                 }
             }
@@ -139,6 +144,11 @@ public class Palette extends JPanel {
                 }
                 else if(e.getSource() == cPicker){
                     addColor(ColorPicker.mainColor);
+                }
+            }
+            else if(e.getSource() == cLabel){
+                if(cLabel.isSelected){
+                    cPicker.setColor(cLabel.colorOn(e.getPoint()));
                 }
             }
             repaint();
