@@ -19,16 +19,20 @@ public class Palette extends JPanel {
     private int selectedIdx;
     private mListener lis = new mListener();
 
-//    public static void main(String[] args){
-//        JFrame win = new JFrame("Palette test");
-//        Palette p = new Palette();
-//        p.addColor(Color.darkGray);
-//        p.addColor(Color.CYAN);
-//        win.setVisible(true);
-//        win.setSize(new Dimension(600,400));
-//        win.add(p,BorderLayout.CENTER);
-//        win.setMinimumSize(new Dimension(100,100));
-//    }
+    private ColorPicker cPicker;
+    private ColorLabel cLabel;
+    private SwipePanel sPanel;
+
+    public static void main(String[] args){
+        JFrame win = new JFrame("Palette test");
+        Palette p = new Palette();
+        p.addColor(Color.darkGray);
+        p.addColor(Color.CYAN);
+        win.setVisible(true);
+        win.setSize(new Dimension(600,400));
+        win.add(p,BorderLayout.CENTER);
+        win.setMinimumSize(new Dimension(100,100));
+    }
 
     public Palette(){
         cSet = new ArrayList<>();
@@ -38,6 +42,29 @@ public class Palette extends JPanel {
         setVisible(true);
         addMouseListener(lis);
     }
+
+    public Palette(ColorPicker cp, ColorLabel cl, SwipePanel sp){
+        this();
+        setPicker(cp);
+        setLabel(cl);
+        setSPanel(sp);
+    }
+
+    public void setPicker(ColorPicker cp){
+        cPicker = cp;
+        cp.addMouseListener(lis);
+    }
+
+    public void setLabel(ColorLabel cl){
+        cLabel = cl;
+        cl.addMouseListener(lis);
+    }
+
+    public void setSPanel (SwipePanel sp){
+        sPanel = sp;
+        sp.addMouseListener(lis);
+    }
+
     public void addColor(Color c){
         cSet.add(c);
     }
@@ -93,10 +120,21 @@ public class Palette extends JPanel {
 
         @Override
         public void mouseClicked(MouseEvent e){
-            int idx = inBorder(e.getPoint());
-            if(idx != -1){
-                selectedIdx = idx;
+            if(e.getSource() == this){
+                int idx = inBorder(e.getPoint());
+                if(idx != -1){
+                    selectedIdx = idx;
+                }
             }
+            else if(e.getClickCount() == 2){
+                if(e.getSource() == cLabel){
+                    addColor(cLabel.colorOn(e.getPoint()));
+                }
+                else if(e.getSource() == cPicker){
+                    addColor(ColorPicker.mainColor);
+                }
+            }
+            repaint();
         }
     }
 }

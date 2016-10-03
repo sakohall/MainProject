@@ -49,7 +49,8 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	private void doDrawing(Graphics g) {
 		circleCenter = new Point(this.getWidth()/2, this.getHeight()/2);
 		Graphics2D g2d = (Graphics2D)g;
-		circle = new Ellipse2D.Double(circleCenter.getX() - 200, circleCenter.getY() - 200, 400, 400);
+		int r = getWidth()/2  - 50;
+		circle = new Ellipse2D.Double(circleCenter.getX() - r, circleCenter.getY() - r, 2*r, 2*r);
 		
 		//Change hue
 		if(mouseClickedInCircle) {

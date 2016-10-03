@@ -1,5 +1,4 @@
-import java.awt.Dimension;
-import java.awt.Point;
+import java.awt.*;
 
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -11,8 +10,8 @@ public class MainProject {
 		JFrame mainFrame = new JFrame("Have fun with colors");
 		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		mainFrame.setLocation(new Point(10, 10));
-		mainFrame.setSize(new Dimension(1500, 700));
-		mainFrame.setMinimumSize(new Dimension(1200, 600));
+		mainFrame.setSize(new Dimension(600, 400));
+//		mainFrame.setMinimumSize(new Dimension(1200, 600));
 		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.X_AXIS));
@@ -25,6 +24,10 @@ public class MainProject {
 		mainPanel.add(cl);
 		
 		mainFrame.getContentPane().add(mainPanel);
+
+		Palette plt = new Palette(cp,cl,sp);
+
+		mainFrame.add(plt, BorderLayout.SOUTH);
 		mainFrame.pack();
 		mainFrame.setVisible(true);
 	}

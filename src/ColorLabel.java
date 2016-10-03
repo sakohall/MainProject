@@ -57,7 +57,7 @@ public class ColorLabel extends JPanel{
     protected void paintComponent(Graphics gg){
         Graphics2D g= (Graphics2D) gg;
         for(int i=0; i<items.size(); i++){
-            if(items.get(i).isTaking) {
+            if(items.get(i).isTaking && isPassing) {
                 g.setColor(items.get(i).color.darker());
             }
             else{
@@ -90,6 +90,16 @@ public class ColorLabel extends JPanel{
             }
         }
         return -1;
+    }
+
+    public Color colorOn(Point p){
+        int idx = inBorder(p);
+        if(idx != -1){
+            return items.get(idx).color;
+        }
+        else{
+            return null;
+        }
     }
 
     /**
@@ -173,6 +183,7 @@ public class ColorLabel extends JPanel{
                 System.out.println("[Debug] Color Mixed");
             }
             isPassing = false;
+            items.get(iToPass).isTaking=false;
             repaint();
         }
 
