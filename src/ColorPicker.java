@@ -168,5 +168,14 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 		double dy = a.y - b.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
+
+	public void setColor(Color c){
+		float[] hsv = new float[3];
+		Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),hsv);
+		tempHue = hsv[0];
+		tempSaturation = hsv[1];
+		tempBrightness = hsv[2];
+		repaint();
+	}
 	
 }

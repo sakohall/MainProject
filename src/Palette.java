@@ -17,7 +17,7 @@ public class Palette extends JPanel {
     private int rowNum = 2;
     private int uSize = 20; // size of each color unit
     private int selectedIdx;
-    private mListener lis = new mListener();
+    private mListener lis;
 
     private ColorPicker cPicker;
     private ColorLabel cLabel;
@@ -40,6 +40,7 @@ public class Palette extends JPanel {
         setSize(new Dimension(colNum*uSize,rowNum*uSize));
         setMinimumSize(new Dimension(colNum*uSize,rowNum*uSize));
         setVisible(true);
+        lis = new mListener(this);
         addMouseListener(lis);
     }
 
@@ -111,19 +112,25 @@ public class Palette extends JPanel {
         int x = p.x / uSize;
         int y = p.y / uSize;
         int idx = x+colNum*y;
+        System.out.println("[Debug] Palette: in border "+ Integer.toString(idx));
         return idx>=cSet.size()?-1:idx;
     }
     private class mListener extends MouseAdapter{
-        public mListener(){
+        Palette pp;
+        public mListener(Palette p){
             super();
+            pp = p;
         }
 
         @Override
         public void mouseClicked(MouseEvent e){
-            if(e.getSource() == this){
+            if(e.getSource() == pp){
+                System.out.println("[Debug] Palette mouse clicked");
                 int idx = inBorder(e.getPoint());
                 if(idx != -1){
                     selectedIdx = idx;
+                    cPicker.setColor(cSet.get(idx));
+                    System.out.println("[Debug] color picker updated");
                 }
             }
             else if(e.getClickCount() == 2){
