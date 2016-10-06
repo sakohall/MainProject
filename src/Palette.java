@@ -21,7 +21,7 @@ public class Palette extends JPanel {
 
     private ColorPicker cPicker;
     private ColorLabel cLabel;
-    private SwipePanel sPanel;
+//    private SwipePanel sPanel;
 
     public static void main(String[] args){
         JFrame win = new JFrame("Palette test");
@@ -44,11 +44,11 @@ public class Palette extends JPanel {
         addMouseListener(lis);
     }
 
-    public Palette(ColorPicker cp, ColorLabel cl, SwipePanel sp){
+    public Palette(ColorPicker cp, ColorLabel cl){
         this();
         setPicker(cp);
         setLabel(cl);
-        setSPanel(sp);
+//        setSPanel(sp);
     }
 
     public void setPicker(ColorPicker cp){
@@ -61,10 +61,10 @@ public class Palette extends JPanel {
         cl.addMouseListener(lis);
     }
 
-    public void setSPanel (SwipePanel sp){
-        sPanel = sp;
-        sp.addMouseListener(lis);
-    }
+//    public void setSPanel (SwipePanel sp){
+//        sPanel = sp;
+//        sp.addMouseListener(lis);
+//    }
 
     public void addColor(Color c){
         cSet.add(c);

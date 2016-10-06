@@ -60,6 +60,7 @@ public class ColorLabel extends JPanel{
     
     @Override
     protected void paintComponent(Graphics gg){
+    	super.paintComponent(gg);
         Graphics2D g= (Graphics2D) gg;
         for(int i=0; i<items.size(); i++){
             if(items.get(i).isTaking && isPassing) {
