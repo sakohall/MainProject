@@ -4,8 +4,9 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.TimerTask;
+import java.awt.geom.Ellipse2D;
+import java.util.*;
+import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -26,6 +27,7 @@ public class ColorLabel extends JPanel{
     public int idxSelected;
     
     ArrayList<ColorItem> items;
+
     private Point takingPos;
 
     mListener mouseListener;
@@ -52,6 +54,80 @@ public class ColorLabel extends JPanel{
         Point pos;
         boolean isTaking; // flag for whether the pointer is taking color on this item
         // if yes, the color item will be shown darker in order to distinguish the two
+        boolean isExplored;
+        java.util.Timer t;
+
+        public ColorItem(Color c, Point p, boolean ex){
+            color = c;
+            pos = p;
+            isExplored = ex;
+            if(isExplored){
+                radius = 15;
+                t = new Timer();
+                t.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        radius -= 2;
+                        if(radius <= 0){
+                            this.cancel();
+                            deleteColor(ColorItem.this);
+                        }
+                        repaint();
+                    }
+                },500,2000);
+            }
+            else{
+                radius = 0;
+            }
+        }
+
+        public void confirm(){
+            isExplored = false;
+            if(t!=null){
+                t.cancel();
+                t = null;
+            }
+        }
+
+        public Color generateSimilar(double d){
+            boolean rp, gp, bp;
+            double rr,gr,br;
+            int r,g,b;
+            rp = ThreadLocalRandom.current().nextBoolean();
+            gp = ThreadLocalRandom.current().nextBoolean();
+            bp = ThreadLocalRandom.current().nextBoolean();
+            double randA,randB;
+            randA = 0.002;
+            randB = 0.01;
+            if(rp)
+                rr = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                rr = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            if(gp)
+                gr = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                gr = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            if(bp)
+                br = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                br = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            r = Math.min((int)(color.getRed()*rr),255);
+            r = Math.max(r,0);
+
+            g = Math.min((int)(color.getGreen()*gr),255);
+            g = Math.max(g,0);
+
+            b = Math.min((int)(color.getBlue()*br),255);
+            b = Math.max(b,0);
+            System.out.println("[Debug] r, g, b : "+Double.toString(rr) + " " + Double.toString(gr) + " " + Double.toString(br));
+            return new Color(r,g,b);
+        }
+    }
+
+
+
+    private void deleteColor(ColorItem c){
+        items.remove(c);
     }
     
     /**
@@ -89,7 +165,8 @@ public class ColorLabel extends JPanel{
                         2*items.get(i).radius+10);
             }
 
-        }
+      }
+
         if(isPassing){
             g.setColor(cToPass);
             g.fillOval(takingPos.x-rToPass,
@@ -139,20 +216,47 @@ public class ColorLabel extends JPanel{
 
         @Override
         public void mouseClicked(MouseEvent e){
-            int idx = inBorder(e.getPoint());
-            if(idx != -1){
-                if(isNew){
-                    isNew = false;
+            if(SwingUtilities.isRightMouseButton(e)){
+                ColorItem closest=null;
+                double dis;
+                double minDis = Double.MAX_VALUE;
+                for(ColorItem ci : items){
+                    dis = ci.pos.distance(e.getPoint());
+                    if(dis<minDis){
+                        minDis = dis;
+                        closest = ci;
+                    }
+                }
+                if(closest!=null) {
+                    items.add(new ColorItem(closest.generateSimilar(minDis), e.getPoint(), true));
+                }
+            }
+            else{
+                int idx = inBorder(e.getPoint());
+                if(idx != -1){
+                    if(isNew){
+                        isNew = false;
+                    }
+                    else{
+                        isSelected = idx==idxSelected || !isSelected;
+                        idxSelected = idx;
+                    }
+
+                    if(items.get(idx).isExplored){
+                        items.get(idx).confirm();
+                        isSelected = false;
+                        items.get(idx).radius += 10;
+                    }
+
+
+
                 }
                 else{
-                    isSelected = true;
-                    idxSelected = idx;
+                    isSelected = false;
                 }
 
             }
-            else{
-                isSelected = false;
-            }
+            repaint();
         }
 
         @Override
@@ -179,6 +283,7 @@ public class ColorLabel extends JPanel{
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
             isSelected = false;
+
             takingPos = e.getPoint();
             int idx = inBorder(takingPos);
             if(t == null){
@@ -204,10 +309,7 @@ public class ColorLabel extends JPanel{
                 t0.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        ColorItem ci = new ColorItem();
-                        ci.radius=0;
-                        ci.color=ColorPicker.mainColor;
-                        ci.pos=e.getPoint();
+                        ColorItem ci = new ColorItem(ColorPicker.mainColor, e.getPoint(), false);
                         items.add(ci);
                         isNew = true;
                     }
@@ -240,8 +342,11 @@ public class ColorLabel extends JPanel{
                 items.get(idx).color = mixColor(items.get(idx).color,cToPass, items.get(idx).radius, rToPass);
                 System.out.println("[Debug] Color Mixed");
             }
-            isPassing = false;
-            items.get(iToPass).isTaking=false;
+            if(isPassing){
+                isPassing = false;
+                items.get(iToPass).isTaking=false;
+            }
+
             repaint();
         }
 
@@ -275,5 +380,16 @@ public class ColorLabel extends JPanel{
         public void mouseEntered(MouseEvent e) {
             super.mouseEntered(e);
         }
+    }
+
+    // color dots in the explorer mode
+    private class FadingColor{
+
+
+        public FadingColor(){
+
+        }
+
+
     }
 }
