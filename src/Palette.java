@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Palette extends JPanel {
 
 
-    private ArrayList<Color> cSet;
+    private ArrayList<SelectableColor> cSet;
 
     private int colNum = 5;
     private int rowNum = 2;
@@ -66,12 +66,21 @@ public class Palette extends JPanel {
 //        sp.addMouseListener(lis);
 //    }
 
+    private class SelectableColor{
+        Color color;
+        boolean isSelected;
+
+        public SelectableColor(Color c){
+            color = c;
+        }
+    }
+
     public void addColor(Color c){
-        cSet.add(c);
+        cSet.add(new SelectableColor(c));
     }
-    public void deleteColor(Color c){
-        cSet.remove(c);
-    }
+//    public void deleteColor(Color c){
+//        cSet.remove(c);
+//    }
     public  void deleteColor(int idx){
         cSet.remove(idx);
     }
@@ -82,7 +91,7 @@ public class Palette extends JPanel {
     }
 
     public void setColor(Color c){
-        cSet.set(selectedIdx, c);
+        cSet.get(selectedIdx).color = c;
     }
 
 
@@ -103,8 +112,20 @@ public class Palette extends JPanel {
         for(int i=0; i<cSet.size(); i++){
             int c = i% colNum; //  column
             int r = i/ colNum; // row
-            g2.setColor(cSet.get(i));
+            g2.setColor(cSet.get(i).color);
             g2.fillRect(c*uSize,r*uSize, uSize, uSize);
+
+            if(cSet.get(i).isSelected){
+                g2.setColor(Color.black);
+                final float dash1[] = {10.0f};
+                final  BasicStroke dashed =
+                        new BasicStroke(1.0f,
+                                BasicStroke.CAP_BUTT,
+                                BasicStroke.JOIN_MITER,
+                                10.0f, dash1, 0.0f);
+                g2.setStroke(dashed);
+                g2.drawRect(c*uSize,r*uSize, uSize, uSize);
+            }
         }
     }
 
@@ -112,8 +133,14 @@ public class Palette extends JPanel {
         int x = p.x / uSize;
         int y = p.y / uSize;
         int idx = x+colNum*y;
-        System.out.println("[Debug] Palette: in border "+ Integer.toString(idx));
         return idx>=cSet.size()?-1:idx;
+    }
+
+    public void unSelectAll(){
+        for(SelectableColor c : cSet){
+            c.isSelected = false;
+        }
+        repaint();
     }
     private class mListener extends MouseAdapter{
         Palette pp;
@@ -125,30 +152,34 @@ public class Palette extends JPanel {
         @Override
         public void mouseClicked(MouseEvent e){
             if(e.getSource() == pp){
-                System.out.println("[Debug] Palette mouse clicked");
                 int idx = inBorder(e.getPoint());
                 if(idx != -1){
-                    selectedIdx = idx;
+                    cSet.get(idx).isSelected = true;
                     if(cLabel.isSelected){
-                        cLabel.setColor(cSet.get(idx));
+                        cLabel.setColor(cSet.get(idx).color);
                     }
                     else{
-                        cPicker.setColor(cSet.get(idx));
+                        cPicker.setColor(cSet.get(idx).color);
                     }
-                    System.out.println("[Debug] color picker updated");
+                }
+                else{
+                    unSelectAll();
                 }
             }
-            else if(e.getClickCount() == 2){
-                if(e.getSource() == cLabel){
-                    addColor(cLabel.colorOn(e.getPoint()));
+            else{
+                unSelectAll();
+                if(e.getClickCount() == 2){
+                    if(e.getSource() == cLabel){
+                        addColor(cLabel.colorOn(e.getPoint()));
+                    }
+                    else if(e.getSource() == cPicker){
+                        addColor(ColorPicker.mainColor);
+                    }
                 }
-                else if(e.getSource() == cPicker){
-                    addColor(ColorPicker.mainColor);
-                }
-            }
-            else if(e.getSource() == cLabel){
-                if(cLabel.isSelected){
-                    cPicker.setColor(cLabel.colorOn(e.getPoint()));
+                else if(e.getSource() == cLabel){
+                    if(cLabel.isSelected){
+                        cPicker.setColor(cLabel.colorOn(e.getPoint()));
+                    }
                 }
             }
             repaint();

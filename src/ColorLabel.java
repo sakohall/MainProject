@@ -4,7 +4,6 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Ellipse2D;
 import java.util.*;
 import java.util.Timer;
 import java.util.concurrent.ThreadLocalRandom;
@@ -119,7 +118,6 @@ public class ColorLabel extends JPanel{
 
             b = Math.min((int)(color.getBlue()*br),255);
             b = Math.max(b,0);
-            System.out.println("[Debug] r, g, b : "+Double.toString(rr) + " " + Double.toString(gr) + " " + Double.toString(br));
             return new Color(r,g,b);
         }
     }
@@ -294,7 +292,6 @@ public class ColorLabel extends JPanel{
                 items.get(idx).isTaking = true;
                 rToPass = 0;
                 cToPass = items.get(idx).color;
-                System.out.println("[Debug] mouse pressed: "+cToPass.toString()+" taken");
                 iToPass = idx;
                 t.schedule(new TimerTask() {
                     @Override
@@ -340,7 +337,6 @@ public class ColorLabel extends JPanel{
             }
             if(idx != -1 && isPassing){
                 items.get(idx).color = mixColor(items.get(idx).color,cToPass, items.get(idx).radius, rToPass);
-                System.out.println("[Debug] Color Mixed");
             }
             if(isPassing){
                 isPassing = false;
@@ -351,21 +347,11 @@ public class ColorLabel extends JPanel{
         }
 
         private Color mixColor(Color a, Color b, int ar, int br){
-            if(a == null){
-                System.out.println("[Debug] Color mix: receiver missed.");
-            }
-            else if(b == null){
-                System.out.println("[Debug] Color mix: passer missed");
-            }
             float r = (float)ar*ar/(float)(ar*ar+br*br);
             int nr = Math.round(r*a.getRed()+(1-r)*b.getRed());
             int nb = Math.round(r*a.getBlue()+(1-r)*b.getBlue());
             int ng = Math.round(r*a.getGreen()+(1-r)*b.getGreen());
             Color c = new Color(nr,ng,nb);
-            System.out.println("[Debug] Color mix: "+a.toString());
-            System.out.println("[Debug] Color mix: "+b.toString());
-            System.out.println("[Debug] Color mix: "+c.toString());
-
             return c;
         }
 
@@ -382,14 +368,4 @@ public class ColorLabel extends JPanel{
         }
     }
 
-    // color dots in the explorer mode
-    private class FadingColor{
-
-
-        public FadingColor(){
-
-        }
-
-
-    }
 }
