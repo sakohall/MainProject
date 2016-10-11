@@ -236,8 +236,14 @@ public class ColorLabel extends JPanel{
                         isNew = false;
                     }
                     else{
-                        isSelected = idx==idxSelected || !isSelected;
-                        idxSelected = idx;
+                        if(idx == idxSelected && isSelected){
+                            isSelected = false;
+                        }
+                        else{
+                            idxSelected = idx;
+                            isSelected = true;
+                        }
+
                     }
 
                     if(items.get(idx).isExplored){
@@ -245,9 +251,6 @@ public class ColorLabel extends JPanel{
                         isSelected = false;
                         items.get(idx).radius += 10;
                     }
-
-
-
                 }
                 else{
                     isSelected = false;

@@ -142,6 +142,26 @@ public class Palette extends JPanel {
         }
         repaint();
     }
+
+    public void modifyAll(float Saturation, float Brightness){
+        for(SelectableColor c: cSet){
+            if(c.isSelected){
+                int r = c.color.getRed();
+                int g = c.color.getGreen();
+                int b = c.color.getBlue();
+                float[] hsv = new float[3];
+                Color.RGBtoHSB(r,g,b,hsv);
+                hsv[1]+=Saturation;
+                hsv[2]+=Brightness;
+                hsv[1] =  Math.max(hsv[1],0);
+                hsv[1] =  Math.min(hsv[1],1);
+                hsv[2] = Math.max(hsv[2],0);
+                hsv[2] = Math.min(hsv[2],1);
+                c.color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            }
+        }
+        repaint();
+    }
     private class mListener extends MouseAdapter{
         Palette pp;
         public mListener(Palette p){
