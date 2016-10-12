@@ -27,6 +27,7 @@ public class MainProject {
 		mainFrame.getContentPane().add(mainPanel);
 
 		Palette plt = new Palette(cp,cl);
+        cp.setPalette(plt);
 
 		mainFrame.add(plt, BorderLayout.SOUTH);
 		mainFrame.pack();

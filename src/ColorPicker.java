@@ -47,6 +47,7 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	private int count = 0;
 
 	private ColorLabel cLabel;
+	private Palette plt;
 
 	public ColorPicker(ColorLabel cl) {
 		setPreferredSize(new Dimension(400, 600));
@@ -56,6 +57,10 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 		addMouseMotionListener(this);
 		
 		cLabel = cl;
+	}
+
+	public void setPalette(Palette p){
+		plt = p;
 	}
 	
 	private void doDrawing(Graphics g) {
@@ -77,7 +82,7 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 			double vec2x = (double)(mouseDraggedPoint.x - circleCenter.x)/side2;
 			double vec2y = (double)(mouseDraggedPoint.y - circleCenter.y)/side2;
 //			double angle = Math.acos((side1 * side1 + side2 * side2 - side3 * side3)/(2 * side1 * side2));
-			angleInRadians = Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x);
+			angleInRadians += Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x);
 			angleInDegrees = angleInRadians * 180.0 / Math.PI;
 			while(angleInDegrees < 0) angleInDegrees += 360;
 //			System.out.println(angle);
@@ -90,36 +95,25 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 			dx *= -1.0;
 			double dy = mouseClickedPoint.getY() - mouseDraggedPoint.getY();
 			dy *= -1.0;
-			saturation = (float)dx/(float)292.0;
-			brightness = (float)dy/(float)600.0;
+			float ds = (float)dx/(float)292.0;
+			float db = (float)dy/(float)600.0;
+			saturation += ds;
+			brightness += db;
+			saturation = Math.max(saturation,0);
+			brightness = Math.max(brightness,0);
+			saturation = Math.min(saturation,1);
+			brightness = Math.min(brightness,1);
+			plt.modifyAll(ds,db);
 			drawCircles(g);
 		}
-		
-		if(saturation + tempSaturation >= 1.0) {
-			saturation = 0.0f;
-			tempSaturation = 1.0f;
-		}
-		else if(saturation + tempSaturation < 0.0) {
-			saturation = 0.0f;
-			tempSaturation = 0.0f;
-		}
-		
-		if(brightness + tempBrightness > 1.0) {
-			brightness = 0.0f;
-			tempBrightness = 1.0f;
-		}
-		else if(brightness + tempBrightness < 0.0) {
-			brightness = 0.0f;
-			tempBrightness = 0.0f;
-		}
-		
-		mainColor = Color.getHSBColor(hue + tempHue, saturation + tempSaturation, brightness + tempBrightness);
+
+
+
+		mainColor = Color.getHSBColor(hue, saturation, brightness);
+
 		if(cLabel.isSelected){
 			cLabel.setColor(mainColor);
 		}
-//		float sum1 = saturation + tempSaturation;
-//		float sum2 = brightness + tempBrightness;
-//		System.out.println(sum1 + " " + sum2);
 		g2d.setColor(mainColor);
 		g2d.fill(circle);
 		g2d.setColor(Color.BLACK);
@@ -179,14 +173,14 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	@Override
 	public void mouseReleased(MouseEvent me) {
 		// TODO Auto-generated method stub
-		tempHue += hue;
-		hue = 0.0f;
-		tempSaturation += saturation;
-		saturation = 0.0f;
-		tempBrightness += brightness;
-		brightness = 0.0f;
-		tempAngle += angleInRadians;
-		angleInRadians = 0.0;
+//		tempHue += hue;
+//		hue = 0.0f;
+//		tempSaturation += saturation;
+//		saturation = 0.0f;
+//		tempBrightness += brightness;
+//		brightness = 0.0f;
+//		tempAngle += angleInRadians;
+//		angleInRadians = 0.0;
 		mouseClickedInCircle = false;
 		mouseClickedInSwipePanel = false;
 		circles.clear();
@@ -196,6 +190,7 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	@Override
 	public void mouseDragged(MouseEvent me) {
 		// TODO Auto-generated method stub
+		mouseClickedPoint = mouseDraggedPoint;
 		mouseDraggedPoint = me.getPoint();
 		if(count % 5 == 0) {
 			circles.add(mouseDraggedPoint);
