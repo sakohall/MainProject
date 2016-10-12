@@ -22,6 +22,8 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	public float brightness = 0.0f;
 	public float tempBrightness = 0.9f;
 	public static Color mainColor = Color.RED;
+	public float hue = 0.0f;
+	public float tempHue = 0.0f;
 	
 //	private static JFrame frame;
 //	private JPanel swipePanel;
@@ -34,8 +36,6 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	private Boolean mouseClickedInCircle = false;
 //	private Boolean mouseClickedInSwipePanel = false;
 //	private static Color mainColor = Color.RED;
-	private float hue = 0.0f;
-	private float tempHue = 0.0f;
 //	private float saturation = 0.0f;
 //	private float tempSaturation = 0.9f;
 //	private float brightness = 0.0f;
