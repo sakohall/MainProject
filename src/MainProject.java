@@ -18,6 +18,7 @@ public class MainProject {
 
         ColorLabel cl = new ColorLabel();
 		ColorPicker cp = new ColorPicker(cl);
+        cl.setPicker(cp);
 //		SwipePanel sp = new SwipePanel(cp);
 
 //		mainPanel.add(sp);
