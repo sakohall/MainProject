@@ -33,10 +33,8 @@ public class ColorMixerModel {
             creatingTimer.cancel();
             creatingTimer = null;
             isCreating = false;
-            System.out.println("New item radius:"+Integer.toString(newItem.getR()));
             if(newItem.getR() == 0){
                 colorSet.remove(newItem);
-                System.out.println("Stop creating:"+Integer.toString(colorSet.size()));
             }
         }
     }
@@ -51,12 +49,9 @@ public class ColorMixerModel {
                     minDis = dis;
                     closest = ci;
                 }
-                System.out.println("Dis: "+Double.toString(dis));
             }
             if(closest!=null) {
                 c = closest.generateSimilar(minDis);
-                System.out.println("Color: "+c.toString());
-                System.out.println("Min dis: "+ Double.toString(minDis));
             }
             else{
                 return;
@@ -139,9 +134,7 @@ public class ColorMixerModel {
                         radius -= 2;
                         if(radius<=0){
                             this.cancel();
-                            System.out.println("Self destroy:"+Integer.toString(colorSet.size()));
                             colorSet.remove(ColorItem.this);
-                            System.out.println("Self destroy:"+Integer.toString(colorSet.size()));
                         }
                         ctrl.repaint(ColorItem.this);
                     }
