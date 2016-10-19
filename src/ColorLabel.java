@@ -30,6 +30,7 @@ public class ColorLabel extends JPanel{
     private Point takingPos;
 
     mListener mouseListener;
+    ColorPicker cp;
 
     public ColorLabel(){
     	Border blackline;
@@ -45,6 +46,10 @@ public class ColorLabel extends JPanel{
         isPassing = false;
         isNew = false;
         isSelected = false;
+    }
+
+    public void setPicker(ColorPicker c){
+        cp = c;
     }
 
     private class ColorItem{
@@ -243,7 +248,6 @@ public class ColorLabel extends JPanel{
                             idxSelected = idx;
                             isSelected = true;
                         }
-
                     }
 
                     if(items.get(idx).isExplored){
@@ -256,6 +260,17 @@ public class ColorLabel extends JPanel{
                     isSelected = false;
                 }
 
+            }
+            if(isSelected){
+                Color c = items.get(idxSelected).color;
+                int r = c.getRed();
+                int g = c.getGreen();
+                int b = c.getBlue();
+                float[] hsv = new float[3];
+                Color.RGBtoHSB(r,g,b,hsv);
+                cp.hue = hsv[0];
+                cp.brightness = hsv[2];
+                cp.saturation = hsv[1];
             }
             repaint();
         }

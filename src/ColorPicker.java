@@ -14,34 +14,37 @@ import javax.swing.JRadioButton;
 
 public class ColorPicker extends JPanel implements MouseListener, MouseMotionListener {
 	
-	public Boolean mouseClickedInSwipePanel = false;
-	public Point mouseClickedPoint;
-	public Point mouseDraggedPoint;
-	public float saturation = 0.0f;
-	public float tempSaturation = 0.9f;
-	public float brightness = 0.0f;
-	public float tempBrightness = 0.9f;
-	public static Color mainColor = Color.RED;
-	public float hue = 0.0f;
-	public float tempHue = 0.0f;
+	public Boolean mouseClickedInSwipePanel = false;      //x
+	public Point mouseClickedPoint;                       //x
+	public Point mouseDraggedPoint;                       //x
+	public float saturation = 0.0f;                       //x
+//	public float tempSaturation = 0.9f;
+	public float brightness = 0.0f;                       //x
+//	public float tempBrightness = 0.9f;
+	public static Color mainColor = Color.RED;            //x
+	public float hue = 0.0f;                              //x
+
+//	public float tempHue = 0.0f;
+
 	
 //	private static JFrame frame;
 //	private JPanel swipePanel;
 //	private static JPanel mainPanel;
-	private Ellipse2D.Double circle;
-	private Ellipse2D.Double handle;
+	private Ellipse2D.Double circle;                      //x
+	private Ellipse2D.Double handle;                      //x
 	private Point circleCenter;
 //	private Point mouseClickedPoint;
 //	private Point mouseDraggedPoint;
-	private Boolean mouseClickedInCircle = false;
+	private Boolean mouseClickedInCircle = false;         //x
 //	private Boolean mouseClickedInSwipePanel = false;
 //	private static Color mainColor = Color.RED;
+
 //	private float saturation = 0.0f;
 //	private float tempSaturation = 0.9f;
 //	private float brightness = 0.0f;
 //	private float tempBrightness = 0.9f;
-	private double angleInRadians = 0.0;
-	private double tempAngle = 0.0;
+	private double angleInRadians = 0.0;                  //x
+	private double tempAngle = 0.0;                       //x
 	
 	private ArrayList<Point> circles = new ArrayList<Point>();
 	private int count = 0;
@@ -86,8 +89,9 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 			angleInDegrees = angleInRadians * 180.0 / Math.PI;
 			while(angleInDegrees < 0) angleInDegrees += 360;
 //			System.out.println(angle);
-			hue = (float)angleInDegrees/360.0f;
-			
+			hue  += (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
+			while(hue < 0) hue += 1.f;
+
 		}
 		
 		else if(mouseClickedInSwipePanel){
@@ -218,9 +222,9 @@ public class ColorPicker extends JPanel implements MouseListener, MouseMotionLis
 	public void setColor(Color c){
 		float[] hsv = new float[3];
 		Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),hsv);
-		tempHue = hsv[0];
-		tempSaturation = hsv[1];
-		tempBrightness = hsv[2];
+//		tempHue = hsv[0];
+//		tempSaturation = hsv[1];
+//		tempBrightness = hsv[2];
 		repaint();
 	}
 	
