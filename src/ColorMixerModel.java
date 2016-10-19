@@ -75,6 +75,13 @@ public class ColorMixerModel {
         return isCreating;
     }
 
+    public void changeColor(Color c){
+        if(selectedItem!=null) {
+            selectedItem.color = c;
+            ctrl.repaint(selectedItem);
+        }
+    }
+
     public class ColorItem{
 
         private int radius;
