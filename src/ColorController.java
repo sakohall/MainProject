@@ -62,7 +62,7 @@ public class ColorController extends MouseAdapter{
                 if(!cmModel.isCreating()) {
                     // single click to create random explore purpose color
                     if (tempC == null && cmModel.getSelectedItem() ==null) {
-                        cmModel.addColor(e.getPoint(), Color.magenta, true);
+                        cmModel.addColor(e.getPoint(), null, true);
                     }
                     cmModel.setSelectedItem(tempC);
                 }
@@ -119,11 +119,17 @@ public class ColorController extends MouseAdapter{
 			
 			if(mouseClickedInCircle) {
 				calculateHue();
+                if(cmModel.getSelectedItem()!=null) {
+                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
+                }
 			}
 			
 			else if(mouseClickedInSwipePanel) {
 				calculateSandB();
-				
+                if(cmModel.getSelectedItem()!=null) {
+                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
+                }
+
 				/*
 				 * do Something with the palette here
 				 */
@@ -268,6 +274,9 @@ public class ColorController extends MouseAdapter{
 		float b = cpModel.getBrightness();
 		b += db;
 		cpModel.setBrightness(b);
+        pModel.updateSB(ds,db);
+
+
 	}
 	
 	//Calculate the distance between two points

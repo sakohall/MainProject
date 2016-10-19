@@ -13,8 +13,40 @@ public class PaletteModel {
         Color color;
         boolean isSelected;
 
+        private float[] hsv;
         public SelectableColor(Color c){
             color = c;
+            hsv = new float[3];
+            Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),hsv);
+        }
+
+
+        public float getH(){
+            return hsv[0];
+        }
+
+        public float getS(){
+            return hsv[1];
+        }
+
+        public float getV(){
+            return hsv[2];
+        }
+
+        public void increaseS(float ds){
+            hsv[1]+=ds;
+            hsv[1] = Math.max(hsv[1],0);
+            hsv[1] = Math.min(hsv[1],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
+        }
+
+        public void increaseB(float dv){
+            hsv[2]+=dv;
+            hsv[2] = Math.max(hsv[2],0);
+            hsv[2] = Math.min(hsv[2],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
         }
     }
 
@@ -44,6 +76,10 @@ public class PaletteModel {
         return colors;
     }
 
+    public ArrayList<SelectableColor> getSelectedColors(){
+        return selectedColors;
+    }
+
     public int getSize(){
         return colors.size();
     }
@@ -59,5 +95,11 @@ public class PaletteModel {
         ctrl.repaint(idx);
     }
 
+    public void updateSB(float ds, float db){
+        for(SelectableColor c:selectedColors){
+            c.increaseS(ds);
+            c.increaseB(db);
+        }
+    }
 
 }
