@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*;
 
 /**
@@ -26,6 +28,12 @@ public class ColorMixerUI extends JComponent{
     }
 
     public ColorMixerUI(){
+    	Border blackline;
+		blackline = BorderFactory.createLineBorder(Color.black);
+		setBorder(blackline);
+		
+    	setPreferredSize(new Dimension(400, 600));
+		setVisible(true);
     }
 
     public void registerModel(ColorMixerModel m){

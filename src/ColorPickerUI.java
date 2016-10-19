@@ -13,7 +13,7 @@ public class ColorPickerUI extends JComponent {
 	
 	//Attributes
 	private ColorPickerModel cpModel;
-	private ColorPickerController cpCtrl;
+	private ColorController cpCtrl;
 	
 	private Point circleCenter;
 	private Ellipse2D.Double handle;
@@ -21,24 +21,6 @@ public class ColorPickerUI extends JComponent {
 	
 	private double angleInRadians = 0.0;
 	private double tempAngle = 0.0;
-	private Color mainColor;
-	
-	static public void main(String[] args) {
-		JFrame mainFrame = new JFrame();
-		ColorPickerUI ui = new ColorPickerUI();
-		mainFrame.add(ui, BorderLayout.CENTER);
-		ColorPickerModel model = new ColorPickerModel();
-        ColorPickerController ctrl = new ColorPickerController();
-        
-        ui.registerModel(model);
-        ui.registerController(ctrl);
-        ctrl.registerModel(model);
-        ctrl.registerUI(ui);
-        model.registerCtrl(ctrl);
-        
-        mainFrame.setSize(new Dimension(400, 600));
-        mainFrame.setVisible(true);
-	}
 	
 	//Register the model
 	public void registerModel(ColorPickerModel m){
@@ -46,7 +28,7 @@ public class ColorPickerUI extends JComponent {
     }
 	
 	//Register the controller
-    public void registerController(ColorPickerController c){
+    public void registerController(ColorController c){
         cpCtrl = c;
         addMouseListener(c);
         addMouseMotionListener(c);
@@ -73,10 +55,9 @@ public class ColorPickerUI extends JComponent {
 	
 	//Function that draws the main circle
 	private void drawMainCircle(Graphics2D g2d, int r) {
-		mainColor = Color.getHSBColor(cpModel.getHue(), cpModel.getSaturation(), cpModel.getBrightness());
 		circleCenter = new Point(this.getWidth()/2, this.getHeight()/2);
 		circle = new Ellipse2D.Double(circleCenter.getX() - r, circleCenter.getY() - r, 2*r, 2*r);
-		g2d.setColor(mainColor);
+		g2d.setColor(cpModel.getMainColor());
 		g2d.fill(circle);
 		g2d.setColor(Color.BLACK);
 		g2d.draw(circle);
