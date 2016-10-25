@@ -9,7 +9,7 @@ public class ColorPickerModel {
 	private float hue = 1.0f;
 	private float saturation = 0.8f;
 	private float brightness = 0.9f;
-//	private Color mainColor = Color.RED;
+	private Color mainColor = Color.RED;
 	
 	public void registerCtrl(ColorController c){
         cpCtrl = c;
@@ -46,5 +46,9 @@ public class ColorPickerModel {
 
 	public Color getMainColor() {
 		return Color.getHSBColor(this.hue, this.saturation, this.brightness);
+	}
+
+	public void setMainColor(Color mainColor) {
+		this.mainColor = mainColor;
 	}
 }

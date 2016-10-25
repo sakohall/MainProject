@@ -3,6 +3,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
+import javax.swing.SwingUtilities;
+
 /**
  * Created by zqian on 18/10/2016.
  */
@@ -121,14 +123,24 @@ public class ColorController extends MouseAdapter{
 			mouseDraggedPoint = e.getPoint();
 			
 			if(mouseClickedInCircle) {
-				calculateHue();
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					calculateHue(1);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)){
+					calculateHue(2);
+				}
                 if(cmModel.getSelectedItem()!=null) {
                     cmModel.getSelectedItem().setColor(cpModel.getMainColor());
                 }
 			}
 			
 			else if(mouseClickedInSwipePanel) {
-				calculateSandB();
+				if(SwingUtilities.isLeftMouseButton(e)) {
+					calculateSandB(1);
+				}
+				else if(SwingUtilities.isRightMouseButton(e)) {
+					calculateSandB(2);
+				}
                 if(cmModel.getSelectedItem()!=null) {
                     cmModel.getSelectedItem().setColor(cpModel.getMainColor());
                 }
@@ -187,7 +199,7 @@ public class ColorController extends MouseAdapter{
         }
 
         else if(e.getSource() == cpUI) {
-			if(cpUI.getHandle().contains(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
+			if(cpUI.getHandle().contains(e.getPoint())) {
 				mouseClickedInCircle = true;
 				mouseClickedInSwipePanel = false;
 			}
@@ -237,7 +249,7 @@ public class ColorController extends MouseAdapter{
     }
     
 	//Calculate the rotation angle and hue
-	public void calculateHue() {
+	public void calculateHue(int mode) {
 		double side1 = distance(mouseClickedPoint, cpUI.getCircleCenter());
 		double side2 = distance(mouseDraggedPoint, cpUI.getCircleCenter());
 		double vec1x = (double)(mouseClickedPoint.x - cpUI.getCircleCenter().x)/side1;
@@ -251,12 +263,18 @@ public class ColorController extends MouseAdapter{
 		
 		//Set the hue
 		float h = cpModel.getHue();
-		h += (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
+		if(mode == 1) {
+			h += (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
+		}
+		else if(mode == 2) {
+			double change = (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
+			h += change - 0.002;
+		}
 		cpModel.setHue(h);
 	}
 	
 	//Calculate the saturation and brightness
-	public void calculateSandB() {
+	public void calculateSandB(int mode) {
 		double dx = mouseClickedPoint.getX() - mouseDraggedPoint.getX();
 		dx *= -1.0;
 		double dy = mouseClickedPoint.getY() - mouseDraggedPoint.getY();
@@ -266,12 +284,22 @@ public class ColorController extends MouseAdapter{
 		
 		//Set the saturation
 		float s = cpModel.getSaturation();
-		s += ds;
+		if(mode == 1) {
+			s += ds;
+		}
+		else if(mode == 2) {
+			s += ds * 0.1;
+		}
 		cpModel.setSaturation(s);
 		
 		//Set the brightness
 		float b = cpModel.getBrightness();
-		b += db;
+		if(mode == 1) {
+			b += db;
+		}
+		else if(mode == 2) {
+			b += db * 0.1;
+		}
 		cpModel.setBrightness(b);
         pModel.updateSB(ds,db);
 
