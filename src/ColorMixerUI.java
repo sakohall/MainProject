@@ -25,16 +25,8 @@ public class ColorMixerUI extends JComponent{
         ctrl.registerUI(ui);
         model.registerCtrl(ctrl);
 
-        PaletteUI pui = new PaletteUI();
-        PaletteModel pmodel = new PaletteModel();
 
-        pui.registerController(ctrl);
-        pui.registerModel(pmodel);
-        ctrl.registerModel(pmodel);
-        ctrl.registerUI(pui);
-        pmodel.registerController(ctrl);
 
-        win.add(pui, BorderLayout.SOUTH);
 
         win.setSize(new Dimension(600,400));
         win.setVisible(true);

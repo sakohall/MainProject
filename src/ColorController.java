@@ -14,8 +14,6 @@ public class ColorController extends MouseAdapter{
     private ColorMixerUI cmUI;
     private ColorMixerModel cmModel;
 
-    private PaletteUI pUI;
-    private PaletteModel pModel;
 
     private int pColorPressed;
 
@@ -59,13 +57,6 @@ public class ColorController extends MouseAdapter{
         cpUI = ui;
     }
 
-    public void registerUI(PaletteUI ui){
-        pUI = ui;
-    }
-
-    public void registerModel(PaletteModel model){
-        pModel = model;
-    }
 
     public void mouseClicked(MouseEvent e){
         if(e.getSource() == cmUI){
@@ -80,27 +71,11 @@ public class ColorController extends MouseAdapter{
                 }
 
             }
-            else if(e.getClickCount() == 2){
-                // double click to add the color to palette
-                if(tempC!=null){
-                    pModel.addColor(tempC.getColor());
-                    repaint(pModel.getSize()-1);
-                }
-            }
+
             cmModel.stopCreating();
             cmUI.repaint();
         }
 
-        else if(e.getSource() == pUI){
-            int idx = pUI.getIdx(e.getPoint());
-            if (idx < pModel.getSize()) {
-                if (cmModel.getSelectedItem() == null) {
-                    pModel.select(idx);
-                } else {
-                    cmModel.changeColor(pModel.getColor(idx));
-                }
-            }
-        }
     }
 
     public void mouseDragged(MouseEvent e){
@@ -205,9 +180,6 @@ public class ColorController extends MouseAdapter{
                 tmpC.setSample(true, e.getPoint());
             }
         }
-        else if(e.getSource() == pUI){
-            pColorPressed = pUI.getIdx(e.getPoint());
-        }
 
         else if(e.getSource() == cpUI) {
 			if(cpUI.getHandle().contains(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
@@ -222,13 +194,7 @@ public class ColorController extends MouseAdapter{
 			mouseDraggedPoint = mouseClickedPoint;
 		}
     }
-    public void mouseExited(MouseEvent e) {
-        if (e.getSource() == pUI) {
-            if (pColorPressed >= 0 && pColorPressed < pModel.getSize()) {
-                pModel.removeColor(pColorPressed);
-            }
-        }
-    }
+ 
 
     private ColorMixerModel.ColorItem selectedColor(Point p){
         for(ColorMixerModel.ColorItem c: cmModel.colorSet){
@@ -306,9 +272,6 @@ public class ColorController extends MouseAdapter{
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
-    public void repaint(int c){
-        pUI.repaint(pUI.getBound(c));
-    }
 
     public void repaint(){
         cmUI.repaint();

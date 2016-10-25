@@ -116,17 +116,6 @@ public class View extends  JFrame{
         ctrlPanel.add(clearBtn);
 
 
-
-//        PaletteUI pui = new PaletteUI();
-//        PaletteModel pmodel = new PaletteModel();
-//
-//        pui.registerController(ctrl);
-//        pui.registerModel(pmodel);
-//        ctrl.registerModel(pmodel);
-//        ctrl.registerUI(pui);
-//        pmodel.registerController(ctrl);
-//
-//        add(pui, BorderLayout.SOUTH);
         setSize(new Dimension(800, 600));
         setVisible(true);
     }
