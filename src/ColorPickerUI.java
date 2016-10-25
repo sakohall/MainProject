@@ -5,9 +5,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 
 public class ColorPickerUI extends JComponent {
 	
@@ -21,6 +21,8 @@ public class ColorPickerUI extends JComponent {
 	
 	private double angleInRadians = 0.0;
 	private double tempAngle = 0.0;
+	
+	private ArrayList<Point> circleTrail = new ArrayList<Point>();
 	
 	//Register the model
 	public void registerModel(ColorPickerModel m){
@@ -51,6 +53,21 @@ public class ColorPickerUI extends JComponent {
 		
 		//Drawing the handle
 		drawHandle(g2d, radius);
+		
+		//Drawing the trail effect
+		drawTrail(g);
+	}
+
+	private void drawTrail(Graphics g) {
+		Graphics2D g2d = (Graphics2D) g;
+		
+		for(int i = 0; i < circleTrail.size(); i++) {
+			Ellipse2D.Double cir = new Ellipse2D.Double(circleTrail.get(i).getX() - 5, circleTrail.get(i).getY() - 5, 3.0*i, 3.0*i);
+			Color c = new Color(cpModel.getMainColor().getRed()/255.f, cpModel.getMainColor().getGreen()/255.f, cpModel.getMainColor().getBlue()/255.f, (float)i/circleTrail.size());
+			g2d.setColor(c);
+			g2d.draw(cir);
+			g2d.fill(cir);
+		}
 	}
 	
 	//Function that draws the main circle
@@ -111,4 +128,11 @@ public class ColorPickerUI extends JComponent {
 		this.tempAngle = tempAngle;
 	}
 	
+	public ArrayList<Point> getCircleTrail() {
+		return circleTrail;
+	}
+
+	public void setCircleTrail(ArrayList<Point> circleTrail) {
+		this.circleTrail = circleTrail;
+	}
 }
