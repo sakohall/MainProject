@@ -1,6 +1,9 @@
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.util.ArrayList;
 
 /**
  * Created by zqian on 18/10/2016.
@@ -26,6 +29,13 @@ public class ColorController extends MouseAdapter{
 	
 	private Boolean mouseClickedInSwipePanel = false;
 	private Boolean mouseClickedInCircle = false;
+
+    private GeneralPath mouseTrace;
+    private boolean isTracing;
+
+    public ColorController(){
+        mouseTrace = new GeneralPath();
+    }
     
     //Register the model of the mixer
     public void registerModel(ColorMixerModel model){
@@ -111,6 +121,10 @@ public class ColorController extends MouseAdapter{
                     }
                 }
             }
+
+            if(isTracing){
+                mouseTrace.lineTo(e.getX(),e.getY());
+            }
         }
         
         else if(e.getSource() == cpUI) {
@@ -164,6 +178,11 @@ public class ColorController extends MouseAdapter{
                 cmModel.sampledItem.setSample(false, null);
                 cmModel.sampledItem = null;
             }
+            if(isTracing){
+                isTracing=false;
+                cmModel.deleteColor(pathIntersection());
+                mouseTrace.reset();
+            }
         }
         else if(e.getSource() == cpUI) {
     		mouseClickedInCircle = false;
@@ -177,9 +196,14 @@ public class ColorController extends MouseAdapter{
         if(e.getSource() == cmUI) {
             ColorMixerModel.ColorItem tmpC = selectedColor(e.getPoint());
             if(tmpC == null) {
+                // create a new color
+                // or draw a trace to delete color
+                isTracing = true;
+                mouseTrace.moveTo(e.getX(),e.getY());
                 cmModel.addColor(e.getPoint(), cpModel.getMainColor(), false);
             }
             else{
+                // sampling a certain of color
                 tmpC.setSample(true, e.getPoint());
             }
         }
@@ -292,6 +316,19 @@ public class ColorController extends MouseAdapter{
 
     public void repaint(){
         pUI.repaint();
+    }
+
+    //to judge whether the path intersects with a certain coloritem
+    //so as to delete them
+    private ArrayList<ColorMixerModel.ColorItem> pathIntersection(){
+        ArrayList<ColorMixerModel.ColorItem> toDel = new ArrayList<>();
+        for(ColorMixerModel.ColorItem c: cmModel.colorSet){
+            Ellipse2D.Float cobj = new Ellipse2D.Float(c.getPos().x,c.getPos().y, c.getR(),c.getR());
+            if(mouseTrace.intersects(cobj.getBounds2D())){
+                toDel.add(c);
+            }
+        }
+        return toDel;
     }
 
 }

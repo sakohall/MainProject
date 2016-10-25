@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 
 /**
  * Created by zqian on 18/10/2016.
@@ -70,6 +71,7 @@ public class ColorMixerUI extends JComponent{
         if(model.sample != null){
             model.sample.paint(g2);
         }
+
 
         // draw the selection border
         if(model.getSelectedItem() != null){

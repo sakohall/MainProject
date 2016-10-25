@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -40,6 +41,8 @@ public class ColorMixerModel {
     }
 
     public void addColor(Point p, Color c, boolean fading){
+
+        // The explored color will be in the fading mode
         if(fading){
             double minDis = Double.MAX_VALUE;
             ColorItem closest = null;
@@ -61,6 +64,7 @@ public class ColorMixerModel {
         ColorItem newColor = new ColorItem(c,p,fading);
         colorSet.add(newColor);
 
+        // a normal generated color using long click
         if(!fading) {
             newItem = newColor;
             creatingTimer = new Timer();
@@ -72,6 +76,13 @@ public class ColorMixerModel {
                     ctrl.repaint(newItem);
                 }
             }, 50, 500);
+        }
+    }
+
+    public void deleteColor(ArrayList<ColorItem> d){
+        for(ColorItem c:d){
+            colorSet.remove(c);
+            ctrl.repaint(c);
         }
     }
 
