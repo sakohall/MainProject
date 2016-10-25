@@ -1,7 +1,9 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 
 public class View {
 
@@ -21,16 +23,45 @@ public class View {
         ctrl.registerUI(cpUI);
         cpModel.registerCtrl(ctrl);
         
-        //Adding the color mixer
+        //Adding the color mixer together with the save control panel
+        // where we can achieve the save of the workspace of colormixer and reload them
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BoxLayout(rightPanel,BoxLayout.PAGE_AXIS));
+        mainFrame.add(rightPanel, BorderLayout.EAST);
         ColorMixerUI cmUI = new ColorMixerUI();
-        mainFrame.add(cmUI, BorderLayout.EAST);
+        rightPanel.add(cmUI);
+
         ColorMixerModel cmModel = new ColorMixerModel();
-        
         cmUI.registerModel(cmModel);
         cmUI.registerController(ctrl);
         ctrl.registerModel(cmModel);
         ctrl.registerUI(cmUI);
         cmModel.registerCtrl(ctrl);
+
+        JPanel ctrlPanel = new JPanel();
+        ctrlPanel.setLayout(new BoxLayout(ctrlPanel, BoxLayout.LINE_AXIS));
+        rightPanel.add(ctrlPanel);
+        JComboBox cbox = new JComboBox();
+        JButton saveBtn = new JButton("Save");
+        saveBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cbox.addItem(cmUI.getIcon());
+            }
+        });
+        JButton clearBtn = new JButton("Clear");
+        clearBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cmModel.clearAll();
+            }
+        });
+
+        ctrlPanel.add(cbox);
+        ctrlPanel.add(saveBtn);
+        ctrlPanel.add(clearBtn);
+
+
 
         PaletteUI pui = new PaletteUI();
         PaletteModel pmodel = new PaletteModel();
@@ -45,5 +76,9 @@ public class View {
         mainFrame.setSize(new Dimension(800, 600));
         mainFrame.setVisible(true);
 	}
+
+	private void saveColorCom(){
+
+    }
 
 }

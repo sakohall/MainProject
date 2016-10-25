@@ -3,6 +3,7 @@ import javax.swing.border.Border;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Created by zqian on 18/10/2016.
@@ -86,6 +87,16 @@ public class ColorMixerUI extends JComponent{
             g2.setStroke(dashed);
             g2.drawOval(c.getPos().x - c.getR(),c.getPos().y - c.getR(), c.getR()*2, c.getR()*2);
         }
+    }
+
+    public ImageIcon getIcon(){
+        BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = img.getGraphics();
+        g.setColor(getForeground());
+        g.setFont(getFont());
+        paintAll(g);
+        Rectangle region = model.getBound();
+        return new ImageIcon(img.getSubimage(region.x, region.y, region.width, region.height));
     }
 
 }

@@ -1,9 +1,12 @@
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * Created by zqian on 18/10/2016.
@@ -19,6 +22,8 @@ public class ColorMixerModel {
     ColorController ctrl;
 
     ColorItem newItem;
+
+    Rectangle bound;
 
     public ColorMixerModel(){
         colorSet = new ArrayList<>();
@@ -36,6 +41,9 @@ public class ColorMixerModel {
             isCreating = false;
             if(newItem.getR() == 0){
                 colorSet.remove(newItem);
+            }
+            else{
+                updateBound(newItem);
             }
         }
     }
@@ -92,6 +100,7 @@ public class ColorMixerModel {
         }
         else if(c != null && c.isFading){
             c.select();
+            updateBound(c);
         }
         else{
             selectedItem = c;
@@ -116,6 +125,24 @@ public class ColorMixerModel {
             selectedItem.color = c;
             ctrl.repaint(selectedItem);
         }
+    }
+
+    public Rectangle getBound(){
+        return bound;
+    }
+
+    public void updateBound(ColorItem c){
+        if(bound == null){
+            bound = new Rectangle(c.getBound());
+        }
+        else{
+            bound = bound.union(c.getBound());
+        }
+    }
+
+    public void clearAll(){
+        colorSet.clear();
+        ctrl.repaint();
     }
 
     public class ColorItem{
