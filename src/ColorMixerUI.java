@@ -2,6 +2,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Created by zqian on 18/10/2016.
@@ -23,16 +25,8 @@ public class ColorMixerUI extends JComponent{
         ctrl.registerUI(ui);
         model.registerCtrl(ctrl);
 
-        PaletteUI pui = new PaletteUI();
-        PaletteModel pmodel = new PaletteModel();
 
-        pui.registerController(ctrl);
-        pui.registerModel(pmodel);
-        ctrl.registerModel(pmodel);
-        ctrl.registerUI(pui);
-        pmodel.registerController(ctrl);
 
-        win.add(pui, BorderLayout.SOUTH);
 
         win.setSize(new Dimension(600,400));
         win.setVisible(true);
@@ -71,6 +65,7 @@ public class ColorMixerUI extends JComponent{
             model.sample.paint(g2);
         }
 
+
         // draw the selection border
         if(model.getSelectedItem() != null){
             ColorMixerModel.ColorItem c = model.getSelectedItem();
@@ -84,6 +79,19 @@ public class ColorMixerUI extends JComponent{
             g2.setStroke(dashed);
             g2.drawOval(c.getPos().x - c.getR(),c.getPos().y - c.getR(), c.getR()*2, c.getR()*2);
         }
+    }
+
+    public ImageIcon getIcon(int w, int h){
+        BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
+        Graphics g = img.getGraphics();
+        g.setColor(getForeground());
+        g.setFont(getFont());
+        paintAll(g);
+        Rectangle region = model.getBound();
+        if(region == null)
+            return null;
+        return new ImageIcon(img.getSubimage(region.x, region.y, region.width, region.height)
+                .getScaledInstance(w,h,Image.SCALE_FAST));
     }
 
 }

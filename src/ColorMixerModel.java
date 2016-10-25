@@ -1,8 +1,12 @@
+import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
+
 
 /**
  * Created by zqian on 18/10/2016.
@@ -19,9 +23,23 @@ public class ColorMixerModel {
 
     ColorItem newItem;
 
+    Rectangle bound;
+
     public ColorMixerModel(){
         colorSet = new ArrayList<>();
         isCreating = false;
+    }
+
+    public ColorMixerModel(ColorController c){
+        colorSet = new ArrayList<>();
+        isCreating = false;
+        ctrl = c;
+    }
+
+    public ColorMixerModel(ColorMixerModel m){
+        colorSet = new ArrayList<>(m.colorSet);
+        ctrl = m.ctrl;
+        bound = m.getBound();
     }
 
     public void registerCtrl(ColorController c){
@@ -36,10 +54,15 @@ public class ColorMixerModel {
             if(newItem.getR() == 0){
                 colorSet.remove(newItem);
             }
+            else{
+                updateBound(newItem);
+            }
         }
     }
 
     public void addColor(Point p, Color c, boolean fading){
+
+        // The explored color will be in the fading mode
         if(fading){
             double minDis = Double.MAX_VALUE;
             ColorItem closest = null;
@@ -61,6 +84,7 @@ public class ColorMixerModel {
         ColorItem newColor = new ColorItem(c,p,fading);
         colorSet.add(newColor);
 
+        // a normal generated color using long click
         if(!fading) {
             newItem = newColor;
             creatingTimer = new Timer();
@@ -75,12 +99,21 @@ public class ColorMixerModel {
         }
     }
 
+    public void deleteColor(ArrayList<ColorItem> d){
+        for(ColorItem c:d){
+            colorSet.remove(c);
+            ctrl.repaint(c);
+        }
+        recaculateBound();
+    }
+
     public void setSelectedItem(ColorItem c){
         if(selectedItem == c){
             selectedItem = null;
         }
         else if(c != null && c.isFading){
             c.select();
+            updateBound(c);
         }
         else{
             selectedItem = c;
@@ -107,6 +140,38 @@ public class ColorMixerModel {
         }
     }
 
+    public Rectangle getBound(){
+        return bound;
+    }
+
+    public void updateBound(ColorItem c){
+        if(bound == null){
+            bound = new Rectangle(c.getBound());
+        }
+        else{
+            bound = bound.union(c.getBound());
+        }
+    }
+
+    public void recaculateBound(){
+        bound = null;
+        for(ColorItem c:colorSet){
+            updateBound(c);
+        }
+    }
+
+    public void clearAll(){
+        colorSet.clear();
+        bound = null;
+        ctrl.repaint();
+    }
+
+    public void updateSB(float ds, float db){
+        for(ColorItem c:colorSet){
+            c.increaseS(ds);
+            c.increaseB(db);
+        }
+    }
     public class ColorItem{
 
         private int radius;
@@ -286,6 +351,34 @@ public class ColorMixerModel {
                 g.setColor(color);
             }
             g.fillOval(pos.x-radius, pos.y-radius, radius*2, radius*2);
+        }
+
+        public float getH(){
+            return hsv[0];
+        }
+
+        public float getS(){
+            return hsv[1];
+        }
+
+        public float getV(){
+            return hsv[2];
+        }
+
+        public void increaseS(float ds){
+            hsv[1]+=ds;
+            hsv[1] = Math.max(hsv[1],0);
+            hsv[1] = Math.min(hsv[1],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
+        }
+
+        public void increaseB(float dv){
+            hsv[2]+=dv;
+            hsv[2] = Math.max(hsv[2],0);
+            hsv[2] = Math.min(hsv[2],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
         }
     }
 
