@@ -36,7 +36,9 @@ public class ColorController extends MouseAdapter{
     public ColorController(){
         mouseTrace = new GeneralPath();
     }
-    
+
+	private int count = 0;
+
     //Register the model of the mixer
     public void registerModel(ColorMixerModel model){
         cmModel = model;
@@ -148,17 +150,13 @@ public class ColorController extends MouseAdapter{
 				 * do Something with the palette here
 				 */
 				
-				/*
-				 * draw fading effect here
-				 */
-				
-//				if(count % 5 == 0) {
-//				circles.add(mouseDraggedPoint);
-//				if(circles.size() == 10) {
-//					circles.remove(0);
-//				}
-//			}
-//			count++;
+				if(count % 5 == 0) {
+					cpUI.getCircleTrail().add(mouseDraggedPoint);
+					if(cpUI.getCircleTrail().size() == 10) {
+						cpUI.getCircleTrail().remove(0);
+					}
+				}
+				count++;
 			}
 
 			cpUI.repaint();
@@ -187,7 +185,7 @@ public class ColorController extends MouseAdapter{
         else if(e.getSource() == cpUI) {
     		mouseClickedInCircle = false;
     		mouseClickedInSwipePanel = false;
-//    		circles.clear();
+    		cpUI.getCircleTrail().clear();
     		cpUI.repaint();
         }
     }
