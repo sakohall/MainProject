@@ -70,8 +70,11 @@ public class ColorController extends MouseAdapter{
                         cmModel.addColor(e.getPoint(), null, true);
                     }
                     cmModel.setSelectedItem(tempC);
-                    cpModel.setMainColor(tempC.getColor());
-                    cpUI.repaint();
+                    if(tempC != null) {
+                        cpModel.setMainColor(tempC.getColor());
+                        cpUI.repaint();
+                    }
+
                 }
 
             }
@@ -119,9 +122,6 @@ public class ColorController extends MouseAdapter{
 				else if(SwingUtilities.isRightMouseButton(e)){
 					calculateHue(2);
 				}
-                if(cmModel.getSelectedItem()!=null) {
-                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
-                }
 			}
 			
 			else if(mouseClickedInSwipePanel) {
@@ -132,7 +132,7 @@ public class ColorController extends MouseAdapter{
 					calculateSandB(2);
 				}
                 if(cmModel.getSelectedItem()!=null) {
-                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
+                    cmModel.changeColor(cpModel.getMainColor());
                 }
 
 				/*
@@ -262,14 +262,17 @@ public class ColorController extends MouseAdapter{
 		
 		//Set the hue
 		float h = cpModel.getHue();
+        double dh=0;
 		if(mode == 1) {
-			h += (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
+            dh = (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
 		}
 		else if(mode == 2) {
 			double change = (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
-			h += change - 0.002;
+            dh = change - 0.002;
 		}
+        h += dh;
 		cpModel.setHue(h);
+        cmModel.updateHue((float)dh);
 	}
 	
 	//Calculate the saturation and brightness

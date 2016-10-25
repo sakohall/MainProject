@@ -17,7 +17,7 @@ public class ColorMixerModel {
     Timer creatingTimer;
     ColorItem sample;
     ColorItem sampledItem;
-    private ColorItem selectedItem;
+    private ArrayList<ColorItem> selectedItem;
 
     ColorController ctrl;
 
@@ -28,6 +28,7 @@ public class ColorMixerModel {
     public ColorMixerModel(){
         colorSet = new ArrayList<>();
         isCreating = false;
+        selectedItem = new ArrayList<>();
     }
 
     public ColorMixerModel(ColorController c){
@@ -37,9 +38,11 @@ public class ColorMixerModel {
     }
 
     public ColorMixerModel(ColorMixerModel m){
+        this();
         colorSet = new ArrayList<>(m.colorSet);
         ctrl = m.ctrl;
         bound = m.getBound();
+        sample = null;
     }
 
     public void registerCtrl(ColorController c){
@@ -47,7 +50,9 @@ public class ColorMixerModel {
     }
 
     public void stopCreating(){
+        System.out.println("enter ");
         if(creatingTimer!= null){
+            System.out.println("T_T ");
             creatingTimer.cancel();
             creatingTimer = null;
             isCreating = false;
@@ -104,29 +109,28 @@ public class ColorMixerModel {
             colorSet.remove(c);
             ctrl.repaint(c);
         }
-        recaculateBound();
+        recalculateBound();
     }
 
     public void setSelectedItem(ColorItem c){
-        if(selectedItem == c){
-            selectedItem = null;
-        }
-        else if(c != null && c.isFading){
+        if(c != null){
             c.select();
             updateBound(c);
         }
         else{
-            selectedItem = c;
+            unselect();
         }
 
     }
 
-    public ColorItem getSelectedItem(){
+    public ArrayList<ColorItem> getSelectedItem(){
         return selectedItem;
     }
 
     public void unselect(){
-        selectedItem = null;
+        while(selectedItem.size()!=0){
+            selectedItem.get(0).select();
+        }
     }
 
     public boolean isCreating(){
@@ -135,8 +139,10 @@ public class ColorMixerModel {
 
     public void changeColor(Color c){
         if(selectedItem!=null) {
-            selectedItem.color = c;
-            ctrl.repaint(selectedItem);
+            for(ColorItem i: selectedItem) {
+                i.color = c;
+                ctrl.repaint(i);
+            }
         }
     }
 
@@ -153,7 +159,7 @@ public class ColorMixerModel {
         }
     }
 
-    public void recaculateBound(){
+    public void recalculateBound(){
         bound = null;
         for(ColorItem c:colorSet){
             updateBound(c);
@@ -166,10 +172,16 @@ public class ColorMixerModel {
         ctrl.repaint();
     }
 
-    public void updateSB(float ds, float db){
-        for(ColorItem c:colorSet){
+    public void updateSB( float ds, float db){
+        for(ColorItem c:selectedItem){
             c.increaseS(ds);
             c.increaseB(db);
+        }
+    }
+
+    public void updateHue(float dh){
+        for(ColorItem c:selectedItem){
+            c.increaseH(dh);
         }
     }
     public class ColorItem{
@@ -181,6 +193,7 @@ public class ColorMixerModel {
         private float[] hsv;
         private boolean isFading;
         private Timer timer;
+        private boolean isSelected;
 
         public ColorItem(Color c, Point p, boolean fading){
             color = c;
@@ -213,6 +226,16 @@ public class ColorMixerModel {
                 timer.cancel();
                 timer = null;
                 radius += 5;
+            }
+            else {
+                isSelected = !isSelected;
+                if(isSelected){
+                    selectedItem.add(this);
+                }
+                else{
+                    selectedItem.remove(this);
+                }
+
             }
         }
 
@@ -265,6 +288,7 @@ public class ColorMixerModel {
         public void setSample(boolean s, Point p){
             isSampling = s;
             if(s && sample == null){
+                System.out.println("CreatingTimer");
                 sample = new ColorItem(color, p, false);
                 creatingTimer = new Timer();
                 creatingTimer.schedule(new TimerTask() {
@@ -351,6 +375,17 @@ public class ColorMixerModel {
                 g.setColor(color);
             }
             g.fillOval(pos.x-radius, pos.y-radius, radius*2, radius*2);
+            if(isSelected){
+                g.setColor(Color.black);
+                final float dash1[] = {10.0f};
+                final  BasicStroke dashed =
+                        new BasicStroke(1.0f,
+                                BasicStroke.CAP_BUTT,
+                                BasicStroke.JOIN_MITER,
+                                10.0f, dash1, 0.0f);
+                g.setStroke(dashed);
+                g.drawOval(getPos().x - getR(),getPos().y - getR(), getR()*2, getR()*2);
+            }
         }
 
         public float getH(){
@@ -377,6 +412,14 @@ public class ColorMixerModel {
             hsv[2]+=dv;
             hsv[2] = Math.max(hsv[2],0);
             hsv[2] = Math.min(hsv[2],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
+        }
+
+        public void increaseH(float dh){
+            hsv[0]+=dh;
+            hsv[0] = Math.max(hsv[0],0);
+            hsv[0] = Math.min(hsv[0],1);
             color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
             ctrl.repaint();
         }

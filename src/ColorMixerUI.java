@@ -26,8 +26,6 @@ public class ColorMixerUI extends JComponent{
         model.registerCtrl(ctrl);
 
 
-
-
         win.setSize(new Dimension(600,400));
         win.setVisible(true);
     }
@@ -66,19 +64,7 @@ public class ColorMixerUI extends JComponent{
         }
 
 
-        // draw the selection border
-        if(model.getSelectedItem() != null){
-            ColorMixerModel.ColorItem c = model.getSelectedItem();
-            g2.setColor(Color.black);
-            final float dash1[] = {10.0f};
-            final  BasicStroke dashed =
-                    new BasicStroke(1.0f,
-                            BasicStroke.CAP_BUTT,
-                            BasicStroke.JOIN_MITER,
-                            10.0f, dash1, 0.0f);
-            g2.setStroke(dashed);
-            g2.drawOval(c.getPos().x - c.getR(),c.getPos().y - c.getR(), c.getR()*2, c.getR()*2);
-        }
+
     }
 
     public ImageIcon getIcon(int w, int h){
