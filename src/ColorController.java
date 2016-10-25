@@ -70,6 +70,8 @@ public class ColorController extends MouseAdapter{
                         cmModel.addColor(e.getPoint(), null, true);
                     }
                     cmModel.setSelectedItem(tempC);
+                    cpModel.setMainColor(tempC.getColor());
+                    cpUI.repaint();
                 }
 
             }
@@ -199,6 +201,14 @@ public class ColorController extends MouseAdapter{
 				mouseClickedInSwipePanel = false;
 			}
 			else {
+				for(int i = 0; i < 8; i++) {
+					if(cpUI.getFixCircle(i).contains(e.getPoint())) {
+						cpModel.setMainColor(cpUI.getFixCircleColor(i));
+						cpUI.repaint();
+						mouseClickedInCircle = false;
+						mouseClickedInSwipePanel = false;
+					}
+				}
 				mouseClickedInCircle = false;
 				mouseClickedInSwipePanel = true;
 			}

@@ -50,5 +50,8 @@ public class ColorPickerModel {
 
 	public void setMainColor(Color mainColor) {
 		this.mainColor = mainColor;
+		this.hue = Color.RGBtoHSB(this.mainColor.getRed(), this.mainColor.getGreen(), this.mainColor.getBlue(), null)[0];
+		this.saturation = Color.RGBtoHSB(this.mainColor.getRed(), this.mainColor.getGreen(), this.mainColor.getBlue(), null)[1];
+		this.brightness = Color.RGBtoHSB(this.mainColor.getRed(), this.mainColor.getGreen(), this.mainColor.getBlue(), null)[2];
 	}
 }

@@ -18,6 +18,7 @@ public class ColorPickerUI extends JComponent {
 	private Ellipse2D.Double handle;
 	private Ellipse2D.Double circle;
 	private Ellipse2D.Double[] fixCircles = new Ellipse2D.Double[8];
+	private Color[] fixCircleColors = new Color[8];
 	
 	private double angleInRadians = 0.0;
 	
@@ -73,7 +74,8 @@ public class ColorPickerUI extends JComponent {
 			
 			float h = cpModel.getHue();
 			h +=  (Math.atan2(vec2y, vec2x) - Math.atan2(vec1y, vec1x)) * 180.0 / Math.PI / 360.f;
-			g2d.setColor(Color.getHSBColor(h, cpModel.getSaturation(), cpModel.getBrightness()));
+			fixCircleColors[i] = Color.getHSBColor(h, cpModel.getSaturation(), cpModel.getBrightness());
+			g2d.setColor(fixCircleColors[i]);
 			g2d.draw(fixCircles[i]);
 			g2d.fill(fixCircles[i]);
 		}
@@ -147,5 +149,13 @@ public class ColorPickerUI extends JComponent {
 
 	public void setCircleTrail(ArrayList<Point> circleTrail) {
 		this.circleTrail = circleTrail;
+	}
+	
+	public Color getFixCircleColor(int i) {
+		return fixCircleColors[i];
+	}
+	
+	public Ellipse2D.Double getFixCircle(int i) {
+		return fixCircles[i];
 	}
 }
