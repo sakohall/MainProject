@@ -11,7 +11,13 @@ public class ColorController extends MouseAdapter{
 	//Attributes
     private ColorMixerUI cmUI;
     private ColorMixerModel cmModel;
-    
+
+    private PaletteUI pUI;
+    private PaletteModel pModel;
+
+    private int pColorPressed;
+
+
     private ColorPickerModel cpModel;
 	private ColorPickerUI cpUI;
 	
@@ -44,16 +50,22 @@ public class ColorController extends MouseAdapter{
         cpUI = ui;
     }
 
+    public void registerUI(PaletteUI ui){
+        pUI = ui;
+    }
+
+    public void registerModel(PaletteModel model){
+        pModel = model;
+    }
+
     public void mouseClicked(MouseEvent e){
         if(e.getSource() == cmUI){
+            ColorMixerModel.ColorItem tempC = selectedColor(e.getPoint());
             if(e.getClickCount() == 1){
-
                 if(!cmModel.isCreating()) {
                     // single click to create random explore purpose color
-                    ColorMixerModel.ColorItem tempC = selectedColor(e.getPoint());
-
                     if (tempC == null && cmModel.getSelectedItem() ==null) {
-                        cmModel.addColor(e.getPoint(), Color.magenta, true);
+                        cmModel.addColor(e.getPoint(), null, true);
                     }
                     cmModel.setSelectedItem(tempC);
                 }
@@ -61,31 +73,45 @@ public class ColorController extends MouseAdapter{
             }
             else if(e.getClickCount() == 2){
                 // double click to add the color to palette
+                if(tempC!=null){
+                    pModel.addColor(tempC.getColor());
+                    repaint(pModel.getSize()-1);
+                }
             }
             cmModel.stopCreating();
             cmUI.repaint();
         }
+
+        else if(e.getSource() == pUI){
+            int idx = pUI.getIdx(e.getPoint());
+            if (idx < pModel.getSize()) {
+                if (cmModel.getSelectedItem() == null) {
+                    pModel.select(idx);
+                } else {
+                    cmModel.changeColor(pModel.getColor(idx));
+                }
+            }
+        }
     }
 
     public void mouseDragged(MouseEvent e){
-        cmModel.stopCreating();
-        if(cmModel.sample != null){
-            cmModel.sample.setPos(e.getPoint());
-            if(cmModel.sampledItem != null ){
-                // when the sample enters/ leave the sampled item
-                if(cmModel.sampledItem.isSampling() && !cmModel.sampledItem.contains(cmModel.sample)) {
-                    cmModel.sampledItem.setSample(false, null);
-                    repaint(cmModel.sampledItem, cmModel.sample);
-                }
-                else if(!cmModel.sampledItem.isSampling() && cmModel.sampledItem.contains(cmModel.sample)){
-                    cmModel.sampledItem.setSample(true, null);
-                    repaint(cmModel.sampledItem, cmModel.sample);
-                }
-                else if(cmModel.sampledItem.isSampling()){
-                    repaint(cmModel.sampledItem, cmModel.sample);
-                }
-                else{
-                    repaint(cmModel.sample);
+        if(e.getSource() == cmUI) {
+            cmModel.stopCreating();
+            if (cmModel.sample != null) {
+                cmModel.sample.setPos(e.getPoint());
+                if (cmModel.sampledItem != null) {
+                    // when the sample enters/ leave the sampled item
+                    if (cmModel.sampledItem.isSampling() && !cmModel.sampledItem.contains(cmModel.sample)) {
+                        cmModel.sampledItem.setSample(false, null);
+                        repaint(cmModel.sampledItem, cmModel.sample);
+                    } else if (!cmModel.sampledItem.isSampling() && cmModel.sampledItem.contains(cmModel.sample)) {
+                        cmModel.sampledItem.setSample(true, null);
+                        repaint(cmModel.sampledItem, cmModel.sample);
+                    } else if (cmModel.sampledItem.isSampling()) {
+                        repaint(cmModel.sampledItem, cmModel.sample);
+                    } else {
+                        repaint(cmModel.sample);
+                    }
                 }
             }
         }
@@ -96,11 +122,17 @@ public class ColorController extends MouseAdapter{
 			
 			if(mouseClickedInCircle) {
 				calculateHue();
+                if(cmModel.getSelectedItem()!=null) {
+                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
+                }
 			}
 			
 			else if(mouseClickedInSwipePanel) {
 				calculateSandB();
-				
+                if(cmModel.getSelectedItem()!=null) {
+                    cmModel.getSelectedItem().setColor(cpModel.getMainColor());
+                }
+
 				/*
 				 * do Something with the palette here
 				 */
@@ -119,6 +151,7 @@ public class ColorController extends MouseAdapter{
     }
 
     public void mouseReleased(MouseEvent e){
+        pColorPressed = -1;
         if(e.getSource() == cmUI) {
             ColorMixerModel.ColorItem tmpC = selectedColor(e.getPoint());
             if(tmpC != null && cmModel.sample != null){
@@ -149,6 +182,10 @@ public class ColorController extends MouseAdapter{
                 tmpC.setSample(true, e.getPoint());
             }
         }
+        else if(e.getSource() == pUI){
+            pColorPressed = pUI.getIdx(e.getPoint());
+        }
+
         else if(e.getSource() == cpUI) {
 			if(cpUI.getHandle().contains(e.getPoint()) && e.getButton() == MouseEvent.BUTTON1) {
 				mouseClickedInCircle = true;
@@ -161,6 +198,13 @@ public class ColorController extends MouseAdapter{
 			mouseClickedPoint = e.getPoint();
 			mouseDraggedPoint = mouseClickedPoint;
 		}
+    }
+    public void mouseExited(MouseEvent e) {
+        if (e.getSource() == pUI) {
+            if (pColorPressed >= 0 && pColorPressed < pModel.getSize()) {
+                pModel.removeColor(pColorPressed);
+            }
+        }
     }
 
     private ColorMixerModel.ColorItem selectedColor(Point p){
@@ -229,6 +273,9 @@ public class ColorController extends MouseAdapter{
 		float b = cpModel.getBrightness();
 		b += db;
 		cpModel.setBrightness(b);
+        pModel.updateSB(ds,db);
+
+
 	}
 	
 	//Calculate the distance between two points
@@ -237,5 +284,13 @@ public class ColorController extends MouseAdapter{
 		double dy = a.y - b.y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
+
+    public void repaint(int c){
+        pUI.repaint(pUI.getBound(c));
+    }
+
+    public void repaint(){
+        pUI.repaint();
+    }
 
 }

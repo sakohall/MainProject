@@ -2,6 +2,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Created by zqian on 18/10/2016.
@@ -15,6 +16,8 @@ public class ColorMixerModel {
     private ColorItem selectedItem;
 
     ColorController ctrl;
+
+    ColorItem newItem;
 
     public ColorMixerModel(){
         colorSet = new ArrayList<>();
@@ -30,14 +33,36 @@ public class ColorMixerModel {
             creatingTimer.cancel();
             creatingTimer = null;
             isCreating = false;
+            if(newItem.getR() == 0){
+                colorSet.remove(newItem);
+            }
         }
     }
 
     public void addColor(Point p, Color c, boolean fading){
-        ColorItem newItem = new ColorItem(c,p,fading);
-        colorSet.add(newItem);
+        if(fading){
+            double minDis = Double.MAX_VALUE;
+            ColorItem closest = null;
+            for(ColorItem ci : colorSet){
+                Double dis = ci.pos.distance(p);
+                if(dis > 0 && dis<minDis){
+                    minDis = dis;
+                    closest = ci;
+                }
+            }
+            if(closest!=null) {
+                c = closest.generateSimilar(minDis);
+            }
+            else{
+                return;
+            }
+        }
+
+        ColorItem newColor = new ColorItem(c,p,fading);
+        colorSet.add(newColor);
 
         if(!fading) {
+            newItem = newColor;
             creatingTimer = new Timer();
             creatingTimer.schedule(new TimerTask() {
                 @Override
@@ -73,6 +98,13 @@ public class ColorMixerModel {
 
     public boolean isCreating(){
         return isCreating;
+    }
+
+    public void changeColor(Color c){
+        if(selectedItem!=null) {
+            selectedItem.color = c;
+            ctrl.repaint(selectedItem);
+        }
     }
 
     public class ColorItem{
@@ -126,19 +158,9 @@ public class ColorMixerModel {
         public void setColor(Color c){
             color = c;
             Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),hsv);
+            ctrl.repaint(this);
         }
 
-        public float getH(){
-            return hsv[0];
-        }
-
-        public float getS(){
-            return hsv[1];
-        }
-
-        public float getV(){
-            return hsv[2];
-        }
 
         public void increaseRadius(int r){
             radius+=r;
@@ -221,6 +243,39 @@ public class ColorMixerModel {
             int ng = Math.round(r*a.getGreen()+(1-r)*b.getGreen());
             color = new Color(nr,ng,nb);
             ctrl.repaint(this,c);
+        }
+
+        public Color generateSimilar(double d){
+            boolean rp, gp, bp;
+            double rr,gr,br;
+            int r,g,b;
+            rp = ThreadLocalRandom.current().nextBoolean();
+            gp = ThreadLocalRandom.current().nextBoolean();
+            bp = ThreadLocalRandom.current().nextBoolean();
+            double randA,randB;
+            randA = 0.002;
+            randB = 0.01;
+            if(rp)
+                rr = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                rr = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            if(gp)
+                gr = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                gr = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            if(bp)
+                br = 1.+d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            else
+                br = 1.-d*ThreadLocalRandom.current().nextDouble(randA,randB);
+            r = Math.min((int)(color.getRed()*rr),255);
+            r = Math.max(r,0);
+
+            g = Math.min((int)(color.getGreen()*gr),255);
+            g = Math.max(g,0);
+
+            b = Math.min((int)(color.getBlue()*br),255);
+            b = Math.max(b,0);
+            return new Color(r,g,b);
         }
 
         public void paint(Graphics2D g){

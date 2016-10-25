@@ -31,7 +31,17 @@ public class View {
         ctrl.registerModel(cmModel);
         ctrl.registerUI(cmUI);
         cmModel.registerCtrl(ctrl);
-        
+
+        PaletteUI pui = new PaletteUI();
+        PaletteModel pmodel = new PaletteModel();
+
+        pui.registerController(ctrl);
+        pui.registerModel(pmodel);
+        ctrl.registerModel(pmodel);
+        ctrl.registerUI(pui);
+        pmodel.registerController(ctrl);
+
+        mainFrame.add(pui, BorderLayout.SOUTH);
         mainFrame.setSize(new Dimension(800, 600));
         mainFrame.setVisible(true);
 	}
