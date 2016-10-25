@@ -296,9 +296,7 @@ public class ColorController extends MouseAdapter{
 		float b = cpModel.getBrightness();
 		b += db;
 		cpModel.setBrightness(b);
-        pModel.updateSB(ds,db);
-
-
+        cmModel.updateSB(ds,db);
 	}
 	
 	//Calculate the distance between two points
@@ -313,7 +311,7 @@ public class ColorController extends MouseAdapter{
     }
 
     public void repaint(){
-        pUI.repaint();
+        cmUI.repaint();
     }
 
     //to judge whether the path intersects with a certain coloritem

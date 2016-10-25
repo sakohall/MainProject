@@ -30,6 +30,18 @@ public class ColorMixerModel {
         isCreating = false;
     }
 
+    public ColorMixerModel(ColorController c){
+        colorSet = new ArrayList<>();
+        isCreating = false;
+        ctrl = c;
+    }
+
+    public ColorMixerModel(ColorMixerModel m){
+        colorSet = new ArrayList<>(m.colorSet);
+        ctrl = m.ctrl;
+        bound = m.getBound();
+    }
+
     public void registerCtrl(ColorController c){
         ctrl = c;
     }
@@ -92,6 +104,7 @@ public class ColorMixerModel {
             colorSet.remove(c);
             ctrl.repaint(c);
         }
+        recaculateBound();
     }
 
     public void setSelectedItem(ColorItem c){
@@ -140,11 +153,25 @@ public class ColorMixerModel {
         }
     }
 
+    public void recaculateBound(){
+        bound = null;
+        for(ColorItem c:colorSet){
+            updateBound(c);
+        }
+    }
+
     public void clearAll(){
         colorSet.clear();
+        bound = null;
         ctrl.repaint();
     }
 
+    public void updateSB(float ds, float db){
+        for(ColorItem c:colorSet){
+            c.increaseS(ds);
+            c.increaseB(db);
+        }
+    }
     public class ColorItem{
 
         private int radius;
@@ -324,6 +351,34 @@ public class ColorMixerModel {
                 g.setColor(color);
             }
             g.fillOval(pos.x-radius, pos.y-radius, radius*2, radius*2);
+        }
+
+        public float getH(){
+            return hsv[0];
+        }
+
+        public float getS(){
+            return hsv[1];
+        }
+
+        public float getV(){
+            return hsv[2];
+        }
+
+        public void increaseS(float ds){
+            hsv[1]+=ds;
+            hsv[1] = Math.max(hsv[1],0);
+            hsv[1] = Math.min(hsv[1],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
+        }
+
+        public void increaseB(float dv){
+            hsv[2]+=dv;
+            hsv[2] = Math.max(hsv[2],0);
+            hsv[2] = Math.min(hsv[2],1);
+            color = Color.getHSBColor(hsv[0],hsv[1],hsv[2]);
+            ctrl.repaint();
         }
     }
 

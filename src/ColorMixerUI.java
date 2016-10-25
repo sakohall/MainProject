@@ -89,14 +89,17 @@ public class ColorMixerUI extends JComponent{
         }
     }
 
-    public ImageIcon getIcon(){
+    public ImageIcon getIcon(int w, int h){
         BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = img.getGraphics();
         g.setColor(getForeground());
         g.setFont(getFont());
         paintAll(g);
         Rectangle region = model.getBound();
-        return new ImageIcon(img.getSubimage(region.x, region.y, region.width, region.height));
+        if(region == null)
+            return null;
+        return new ImageIcon(img.getSubimage(region.x, region.y, region.width, region.height)
+                .getScaledInstance(w,h,Image.SCALE_FAST));
     }
 
 }
