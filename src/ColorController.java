@@ -22,8 +22,11 @@ public class ColorController extends MouseAdapter{
 
     private ColorPickerModel cpModel;
 	private ColorPickerUI cpUI;
-	
-	//Attributes needed for the picker
+
+    private PaletteUI pUI;
+    private PaletteModel pModel;
+
+    //Attributes needed for the picker
 	private Point mouseClickedPoint;
 	private Point mouseDraggedPoint;
 	
@@ -58,7 +61,12 @@ public class ColorController extends MouseAdapter{
 	public void registerUI(ColorPickerUI ui){
         cpUI = ui;
     }
-
+    public void registerUI(PaletteUI ui){
+                pUI = ui;
+    }
+    public void registerModel(PaletteModel model){
+        pModel = model;
+    }
 
     public void mouseClicked(MouseEvent e){
         if(e.getSource() == cmUI){
@@ -78,10 +86,28 @@ public class ColorController extends MouseAdapter{
                 }
 
             }
-
+            else if(e.getClickCount() == 2){
+                // double click to add the color to palette
+                if(tempC!=null){
+                    pModel.addColor(tempC.getColor());
+                    repaint(pModel.getSize()-1);
+                }
+            }
             cmModel.stopCreating();
             cmUI.repaint();
         }
+        else if(e.getSource() == pUI){
+            int idx = pUI.getIdx(e.getPoint());
+            if (idx < pModel.getSize()) {
+                if (cmModel.getSelectedItem() == null) {
+                    pModel.select(idx);
+                }
+                else {
+                    cmModel.changeColor(pModel.getColor(idx));
+                }
+            }
+        }
+
 
     }
 
@@ -150,6 +176,17 @@ public class ColorController extends MouseAdapter{
 
 			cpUI.repaint();
 		}
+        else if(e.getSource() == pUI){
+            int idx = pUI.getIdx(e.getPoint());
+            if (idx < pModel.getSize()) {
+                if (cmModel.getSelectedItem() == null) {
+                    pModel.select(idx);
+                }
+                else {
+                    cmModel.changeColor(pModel.getColor(idx));
+                }
+            }
+        }
     }
 
     public void mouseReleased(MouseEvent e){
@@ -216,7 +253,14 @@ public class ColorController extends MouseAdapter{
 			mouseDraggedPoint = mouseClickedPoint;
 		}
     }
- 
+
+    public void mouseExited(MouseEvent e) {
+        if (e.getSource() == pUI) {
+            if (pColorPressed >= 0 && pColorPressed < pModel.getSize()) {
+                pModel.removeColor(pColorPressed);
+            }
+        }
+    }
 
     private ColorMixerModel.ColorItem selectedColor(Point p){
         for(ColorMixerModel.ColorItem c: cmModel.colorSet){
@@ -229,6 +273,9 @@ public class ColorController extends MouseAdapter{
 
     public void repaint(ColorMixerModel.ColorItem c){
         cmUI.repaint(c.getBound());
+    }
+    public void repaint(int c){
+        pUI.repaint(pUI.getBound(c));
     }
 
     public void repaint(ColorMixerModel.ColorItem c1, ColorMixerModel.ColorItem c2){
@@ -245,6 +292,9 @@ public class ColorController extends MouseAdapter{
 
     public void repaint(Rectangle r){
         cmUI.repaint(r);
+    }
+    public void repaint(){
+        pUI.repaint();cmUI.repaint();
     }
     
 	//Calculate the rotation angle and hue
@@ -314,9 +364,7 @@ public class ColorController extends MouseAdapter{
 	}
 
 
-    public void repaint(){
-        cmUI.repaint();
-    }
+
 
     //to judge whether the path intersects with a certain coloritem
     //so as to delete them

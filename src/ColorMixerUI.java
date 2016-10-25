@@ -12,23 +12,6 @@ public class ColorMixerUI extends JComponent{
     private ColorMixerModel model;
     private ColorController controller;
 
-    static public void main(String[] args){
-        JFrame  win = new JFrame();
-        ColorMixerUI ui = new ColorMixerUI();
-        win.add(ui, BorderLayout.CENTER);
-        ColorMixerModel model = new ColorMixerModel();
-        ColorController ctrl = new ColorController();
-
-        ui.registerModel(model);
-        ui.registerController(ctrl);
-        ctrl.registerModel(model);
-        ctrl.registerUI(ui);
-        model.registerCtrl(ctrl);
-
-
-        win.setSize(new Dimension(600,400));
-        win.setVisible(true);
-    }
 
     public ColorMixerUI(){
     	Border blackline;
