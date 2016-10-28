@@ -3,6 +3,8 @@ import java.util.ArrayList;
 /**
  * Created by zqian on 25/10/2016.
  */
+
+// To manage the saving of color mixer
 public class ColorManagerModel {
     ArrayList<ColorMixerModel> set;
     public ColorManagerModel(){

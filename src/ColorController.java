@@ -61,6 +61,8 @@ public class ColorController extends MouseAdapter{
 	public void registerUI(ColorPickerUI ui){
         cpUI = ui;
     }
+
+    // Register the UI/Model of the palette
     public void registerUI(PaletteUI ui){
                 pUI = ui;
     }
@@ -69,15 +71,20 @@ public class ColorController extends MouseAdapter{
     }
 
     public void mouseClicked(MouseEvent e){
+        // click event comes from Color mixer panel
         if(e.getSource() == cmUI){
             ColorMixerModel.ColorItem tempC = selectedColor(e.getPoint());
             if(e.getClickCount() == 1){
                 if(!cmModel.isCreating()) {
-                    // single click to create random explore purpose color
-                    if (tempC == null && cmModel.getSelectedItem() ==null) {
+                    // if there is no color creating and no color selected
+                    // single click to create random explore-purposed color
+                    if (tempC == null && (cmModel.getSelectedItem()== null || cmModel.getSelectedItem().isEmpty())) {
                         cmModel.addColor(e.getPoint(), null, true);
                     }
+                    // select color
+                    // if tempC == null, it will deselect all the color
                     cmModel.setSelectedItem(tempC);
+                    // when selecting a color, set the color picker
                     if(tempC != null) {
                         cpModel.setMainColor(tempC.getColor());
                         cpUI.repaint();
@@ -112,12 +119,18 @@ public class ColorController extends MouseAdapter{
     }
 
     public void mouseDragged(MouseEvent e){
+        // click event comes from Color mixer panel
         if(e.getSource() == cmUI) {
+            // finish the creation
             cmModel.stopCreating();
+
+            // if we are sampling the model
+            // move the sample color to pass it to another color
             if (cmModel.sample != null) {
                 cmModel.sample.setPos(e.getPoint());
                 if (cmModel.sampledItem != null) {
                     // when the sample enters/ leave the sampled item
+                    // set the different display mode
                     if (cmModel.sampledItem.isSampling() && !cmModel.sampledItem.contains(cmModel.sample)) {
                         cmModel.sampledItem.setSample(false, null);
                         repaint(cmModel.sampledItem, cmModel.sample);
@@ -132,6 +145,7 @@ public class ColorController extends MouseAdapter{
                 }
             }
 
+            // save the trace points
             if(isTracing){
                 mouseTrace.lineTo(e.getX(),e.getY());
             }
@@ -157,9 +171,6 @@ public class ColorController extends MouseAdapter{
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					calculateSandB(2);
 				}
-                if(cmModel.getSelectedItem()!=null) {
-                    cmModel.changeColor(cpModel.getMainColor());
-                }
 
 				/*
 				 * do Something with the palette here
@@ -176,32 +187,27 @@ public class ColorController extends MouseAdapter{
 
 			cpUI.repaint();
 		}
-        else if(e.getSource() == pUI){
-            int idx = pUI.getIdx(e.getPoint());
-            if (idx < pModel.getSize()) {
-                if (cmModel.getSelectedItem() == null) {
-                    pModel.select(idx);
-                }
-                else {
-                    cmModel.changeColor(pModel.getColor(idx));
-                }
-            }
-        }
+
     }
 
     public void mouseReleased(MouseEvent e){
         pColorPressed = -1;
         if(e.getSource() == cmUI) {
             ColorMixerModel.ColorItem tmpC = selectedColor(e.getPoint());
+            // if the release point is inside a color
+            // and we are taking a sample color
+            // mix them
             if(tmpC != null && cmModel.sample != null){
                 tmpC.mix(cmModel.sample);
             }
+            // delete the sample anyway
             if(cmModel.sample != null) {
                 cmModel.sample.delete();
                 cmModel.sample = null;
                 cmModel.sampledItem.setSample(false, null);
                 cmModel.sampledItem = null;
             }
+            // to delete the colors which have been passed by the trace
             if(isTracing){
                 isTracing=false;
                 cmModel.deleteColor(pathIntersection());
@@ -220,6 +226,7 @@ public class ColorController extends MouseAdapter{
         if(e.getSource() == cmUI) {
             ColorMixerModel.ColorItem tmpC = selectedColor(e.getPoint());
             if(tmpC == null) {
+                // if clicked on a empty space
                 // create a new color
                 // or draw a trace to delete color
                 isTracing = true;
@@ -262,6 +269,9 @@ public class ColorController extends MouseAdapter{
         }
     }
 
+    // to detect whether a point is inside the existing color
+    // if yes, return the color item
+    // if not, return null
     private ColorMixerModel.ColorItem selectedColor(Point p){
         for(ColorMixerModel.ColorItem c: cmModel.colorSet){
             if(p.distance(c.getPos()) < c.getR()){
@@ -271,13 +281,17 @@ public class ColorController extends MouseAdapter{
         return null;
     }
 
+
+    // repaint a certain color item
     public void repaint(ColorMixerModel.ColorItem c){
         cmUI.repaint(c.getBound());
     }
+    // repaint a certain color in palette
     public void repaint(int c){
         pUI.repaint(pUI.getBound(c));
     }
 
+    // repaint color item when there is intersection of two colors
     public void repaint(ColorMixerModel.ColorItem c1, ColorMixerModel.ColorItem c2){
         if(c1 == null){
             repaint(c2);
@@ -290,9 +304,12 @@ public class ColorController extends MouseAdapter{
         }
     }
 
+    // repaint a region of color mixer
     public void repaint(Rectangle r){
         cmUI.repaint(r);
     }
+
+    // repaint all
     public void repaint(){
         pUI.repaint();cmUI.repaint();
     }
@@ -322,7 +339,7 @@ public class ColorController extends MouseAdapter{
 		}
         h += dh;
 		cpModel.setHue(h);
-        cmModel.updateHue((float)dh);
+        cmModel.updateHue((float)(dh));
 	}
 	
 	//Calculate the saturation and brightness
@@ -336,22 +353,17 @@ public class ColorController extends MouseAdapter{
 		
 		//Set the saturation
 		float s = cpModel.getSaturation();
-		if(mode == 1) {
-			s += ds;
-		}
-		else if(mode == 2) {
-			s += ds * 0.1;
+        if(mode == 2) {
+            ds *= 0.1;
 		}
 		cpModel.setSaturation(s);
 		
 		//Set the brightness
 		float b = cpModel.getBrightness();
-		if(mode == 1) {
-			b += db;
+		if(mode == 2) {
+            db *= 0.1;
 		}
-		else if(mode == 2) {
-			b += db * 0.1;
-		}
+		b+=db;
 		cpModel.setBrightness(b);
         cmModel.updateSB(ds,db);
 	}

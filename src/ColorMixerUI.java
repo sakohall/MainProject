@@ -50,6 +50,7 @@ public class ColorMixerUI extends JComponent{
 
     }
 
+    // return a screen shot of the color set
     public ImageIcon getIcon(int w, int h){
         BufferedImage img = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics g = img.getGraphics();

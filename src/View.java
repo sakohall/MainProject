@@ -28,6 +28,24 @@ public class View extends  JFrame{
         ctrl.registerUI(cpUI);
         cpModel.registerCtrl(ctrl);
 
+
+        initSaveCtrlPanel();
+
+        PaletteUI pui = new PaletteUI();
+        PaletteModel pmodel = new PaletteModel();
+        pui.registerController(ctrl);
+        pui.registerModel(pmodel);
+        ctrl.registerModel(pmodel);
+        ctrl.registerUI(pui);
+        pmodel.registerController(ctrl);
+        add(pui, BorderLayout.SOUTH);
+
+
+        setSize(new Dimension(800, 600));
+        setVisible(true);
+    }
+
+    private void initSaveCtrlPanel(){
         //Adding the color mixer together with the save control panel
         // where we can achieve the save of the workspace of colormixer and reload them
         JPanel rightPanel = new JPanel();
@@ -48,6 +66,8 @@ public class View extends  JFrame{
         JPanel ctrlPanel = new JPanel();
         ctrlPanel.setLayout(new BoxLayout(ctrlPanel, BoxLayout.LINE_AXIS));
         rightPanel.add(ctrlPanel);
+
+        // the combobox for saving/choosing color mixer
         JComboBox cbox = new JComboBox();
         cbox.addItem(new ImageIcon());
         cbox.addItemListener(new ItemListener() {
@@ -69,15 +89,20 @@ public class View extends  JFrame{
                 }
             }
         });
+
+        // save button
         saveBtn = new JButton("Save");
         saveBtn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ImageIcon icon = cmUI.getIcon(50,50);
+                // if there is no color item in the color mixer space
+                // warning message
                 if(icon == null){
                     JOptionPane.showMessageDialog(View.this, "No color item in the panel!");
                 }
                 else {
+                    // add the screenshot of the workspace
                     int idx = managerModel.saveColorSet(cmModel);
                     System.out.println("Save:"+Integer.toString(idx));
                     icon.setDescription(Integer.toString(idx));
@@ -87,6 +112,7 @@ public class View extends  JFrame{
             }
         });
 
+        // replace the saved color set with the new color mixer workspace
         replaceBtn = new JButton("Replace");
         replaceBtn.addActionListener(new ActionListener() {
             @Override
@@ -101,6 +127,7 @@ public class View extends  JFrame{
             }
         });
 
+        // clear the workspace
         clearBtn = new JButton("Clear");
         clearBtn.addActionListener(new ActionListener() {
             @Override
@@ -114,25 +141,10 @@ public class View extends  JFrame{
         ctrlPanel.add(replaceBtn);
         replaceBtn.setEnabled(false);
         ctrlPanel.add(clearBtn);
-
-
-        PaletteUI pui = new PaletteUI();
-        PaletteModel pmodel = new PaletteModel();
-        pui.registerController(ctrl);
-        pui.registerModel(pmodel);
-        ctrl.registerModel(pmodel);
-        ctrl.registerUI(pui);
-        pmodel.registerController(ctrl);
-        add(pui, BorderLayout.SOUTH);
-
-
-        setSize(new Dimension(800, 600));
-        setVisible(true);
     }
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		View mainFrame = new View("Have fun with colors!");
-
 	}
 
 
