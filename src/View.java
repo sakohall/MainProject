@@ -75,7 +75,6 @@ public class View extends  JFrame{
             public void itemStateChanged(ItemEvent e) {
                 if(e.getStateChange() == ItemEvent.SELECTED) {
                     ImageIcon icon = (ImageIcon)cbox.getModel().getSelectedItem();
-                    System.out.println(icon.getDescription());
                     if(icon.getDescription()==null){
                         replaceBtn.setEnabled(false);
                     }
@@ -104,10 +103,8 @@ public class View extends  JFrame{
                 else {
                     // add the screenshot of the workspace
                     int idx = managerModel.saveColorSet(cmModel);
-                    System.out.println("Save:"+Integer.toString(idx));
                     icon.setDescription(Integer.toString(idx));
                     cbox.addItem(icon);
-                    System.out.println(icon.getDescription());
                 }
             }
         });
