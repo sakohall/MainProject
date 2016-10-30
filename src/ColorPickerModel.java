@@ -19,6 +19,7 @@ public class ColorPickerModel {
 		return hue;
 	}
 	
+	//sets the hue and keeps it a positive value
 	public void setHue(float hue) {
 		this.hue = hue;
 		while(this.hue < 0) {
@@ -30,6 +31,7 @@ public class ColorPickerModel {
 		return saturation;
 	}
 	
+	//sets the saturation and keeps it in the range 0 to 1
 	public void setSaturation(float saturation) {
 		this.saturation = Math.max(saturation, 0.f);
 		this.saturation = Math.min(this.saturation, 1.f);
@@ -38,7 +40,8 @@ public class ColorPickerModel {
 	public float getBrightness() {
 		return brightness;
 	}
-
+	
+	//sets the brightness and keeps it in the range 0 to 1
 	public void setBrightness(float brightness) {
 		this.brightness = Math.max(brightness, 0.f);
 		this.brightness = Math.min(this.brightness, 1.f);
@@ -47,7 +50,8 @@ public class ColorPickerModel {
 	public Color getMainColor() {
 		return Color.getHSBColor(this.hue, this.saturation, this.brightness);
 	}
-
+	
+	//sets the main color and its hsb values
 	public void setMainColor(Color mainColor) {
 		this.mainColor = mainColor;
 		this.hue = Color.RGBtoHSB(this.mainColor.getRed(), this.mainColor.getGreen(), this.mainColor.getBlue(), null)[0];

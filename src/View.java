@@ -6,7 +6,7 @@ import java.awt.event.ItemListener;
 
 import javax.swing.*;
 
-public class View extends  JFrame{
+public class View extends JFrame{
     private ColorMixerModel cmModel;
     private ColorPickerUI cpUI;
     ColorPickerModel cpModel;

@@ -27,6 +27,7 @@ public class ColorController extends MouseAdapter{
     private PaletteModel pModel;
 
     //Attributes needed for the picker
+    //Used to calculate the angle of rotation
 	private Point mouseClickedPoint;
 	private Point mouseDraggedPoint;
 	
@@ -103,6 +104,7 @@ public class ColorController extends MouseAdapter{
             cmModel.stopCreating();
             cmUI.repaint();
         }
+        
         else if(e.getSource() == pUI){
             int idx = pUI.getIdx(e.getPoint());
             if (idx < pModel.getSize()) {
@@ -119,7 +121,7 @@ public class ColorController extends MouseAdapter{
     }
 
     public void mouseDragged(MouseEvent e){
-        // click event comes from Color mixer panel
+        // mouse event comes from Color mixer panel
         if(e.getSource() == cmUI) {
             // finish the creation
             cmModel.stopCreating();
@@ -151,31 +153,38 @@ public class ColorController extends MouseAdapter{
             }
         }
         
+        //click event comes from the color picker
         else if(e.getSource() == cpUI) {
 			mouseClickedPoint = mouseDraggedPoint;
 			mouseDraggedPoint = e.getPoint();
 			
+			//if mouse is clicked in the white handle change the hue
 			if(mouseClickedInCircle) {
+				//Hue changes faster with left click
 				if(SwingUtilities.isLeftMouseButton(e)) {
 					calculateHue(1);
 				}
+				//Hue changes slowly with right click
 				else if(SwingUtilities.isRightMouseButton(e)){
 					calculateHue(2);
 				}
 			}
 			
+			//if mouse is clicked anywhere except the handle
+			//and the circles surrounding the main color picker
+			//change saturation and brightness
 			else if(mouseClickedInSwipePanel) {
+				//Saturation and Brightness change faster with left click
 				if(SwingUtilities.isLeftMouseButton(e)) {
 					calculateSandB(1);
 				}
+				//Saturation and Brightness change slowly with right click
 				else if(SwingUtilities.isRightMouseButton(e)) {
 					calculateSandB(2);
 				}
-
-				/*
-				 * do Something with the palette here
-				 */
 				
+				//Add a trail circle (circles that follow the mosue when you press it)
+				//every five times this action listener is called
 				if(count % 5 == 0) {
 					cpUI.getCircleTrail().add(mouseDraggedPoint);
 					if(cpUI.getCircleTrail().size() == 10) {
@@ -214,6 +223,9 @@ public class ColorController extends MouseAdapter{
                 mouseTrace.reset();
             }
         }
+        
+        //if the event is being called from the color picker
+        //remove the trail and set the "clicked" booleans to false
         else if(e.getSource() == cpUI) {
     		mouseClickedInCircle = false;
     		mouseClickedInSwipePanel = false;
@@ -223,6 +235,7 @@ public class ColorController extends MouseAdapter{
     }
 
     public void mousePressed(MouseEvent e){
+    	//if mouse event is called from the color mixer
         if(e.getSource() == cmUI) {
             ColorMixerModel.ColorItem tmpC = selectedColor(e.getPoint());
             if(tmpC == null) {
@@ -238,13 +251,17 @@ public class ColorController extends MouseAdapter{
                 tmpC.setSample(true, e.getPoint());
             }
         }
-
+        
+        //if mouse event is called from the color picker
         else if(e.getSource() == cpUI) {
+        	//if the press is in the handle set the booleans
 			if(cpUI.getHandle().contains(e.getPoint())) {
 				mouseClickedInCircle = true;
 				mouseClickedInSwipePanel = false;
 			}
+			//if the press is anywhere else
 			else {
+				//if the press is inside one of the fix circles change the color directly
 				for(int i = 0; i < 8; i++) {
 					if(cpUI.getFixCircle(i).contains(e.getPoint())) {
 						cpModel.setMainColor(cpUI.getFixCircleColor(i));
@@ -260,7 +277,8 @@ public class ColorController extends MouseAdapter{
 			mouseDraggedPoint = mouseClickedPoint;
 		}
     }
-
+    
+    //Delete the circles in the color mixer
     public void mouseExited(MouseEvent e) {
         if (e.getSource() == pUI) {
             if (pColorPressed >= 0 && pColorPressed < pModel.getSize()) {

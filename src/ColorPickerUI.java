@@ -14,14 +14,21 @@ public class ColorPickerUI extends JComponent {
 	private ColorPickerModel cpModel;
 	private ColorController cpCtrl;
 	
+	//center of the main circle
 	private Point circleCenter;
+	//handle that will allow the rotation of the main circle
 	private Ellipse2D.Double handle;
+	//the main cirlce
 	private Ellipse2D.Double circle;
+	//8 fix circles that are around the main circle
 	private Ellipse2D.Double[] fixCircles = new Ellipse2D.Double[8];
+	//the colors of these circles
 	private Color[] fixCircleColors = new Color[8];
 	
+	//angle of the rotation
 	private double angleInRadians = 0.0;
 	
+	//the trail that the mouse will leave when pressed
 	private ArrayList<Point> circleTrail = new ArrayList<Point>();
 	
 	//Register the model
@@ -61,6 +68,7 @@ public class ColorPickerUI extends JComponent {
 		drawTrail(g);
 	}
 	
+	//Function that draws the 8 fix circles
 	private void drawFixCircles(Graphics2D g2d, int r) {	
 		for(int i = 0; i < 8; i++) {
 			fixCircles[i] = new Ellipse2D.Double(circleCenter.getX() + ((r+20) * Math.cos(Math.PI*i/4)) - 15, circleCenter.getY() + ((r+20) * Math.sin(Math.PI*i/4)) - 15, 30, 30);
@@ -80,7 +88,8 @@ public class ColorPickerUI extends JComponent {
 			g2d.fill(fixCircles[i]);
 		}
 	}
-
+	
+	//Function that draws the tail of the mouse
 	private void drawTrail(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		
